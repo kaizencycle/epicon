@@ -1,0 +1,39 @@
+# Database Migration Example
+# Use this template for schema changes
+
+EPICON INTENT PUBLICATION
+
+ledger_id: myorg:myproject:migration-add-user-preferences
+scope: database
+mode: normal
+issued_at: 2025-12-22T10:00:00Z
+expires_at: 2025-12-29T10:00:00Z
+
+justification: |
+  Adding user_preferences table for personalization features.
+  
+  CONTEXT:
+  - Product team requested user preference storage
+  - Current localStorage approach doesn't sync across devices
+  - Estimated 100k active users
+  
+  MIGRATION PLAN:
+  - New table: user_preferences (id, user_id, key, value, created_at)
+  - No data migration needed (new feature)
+  - Estimated time: < 1 minute
+  - Zero downtime (additive change only)
+  
+  TESTING:
+  - Tested in staging with production data snapshot
+  - Load tested with 1M rows
+  - Rollback script prepared and tested
+  
+  APPROVALS:
+  - DBA team: @dba-lead (approved 2025-12-21)
+  - Security team: @security-lead (approved 2025-12-21)
+
+counterfactuals:
+  - If migration fails in staging, do not proceed to prod
+  - If migration takes >5 minutes, abort and investigate
+  - If any data loss detected, rollback within 1 hour
+  - If rollback script fails, escalate to DBA team immediately

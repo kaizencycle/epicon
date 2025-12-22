@@ -1,0 +1,116 @@
+# EPICON Guard Configuration Example
+# Copy this file to .epicon/config.yml and customize for your project
+
+version: 1
+
+# Organization settings
+organization:
+  name: "myorg"
+  domain: "myorg.com"
+
+# Scope definitions
+# Each scope defines what files it covers and who can review
+scopes:
+  docs:
+    description: "Documentation and markdown files"
+    patterns:
+      - "docs/**"
+      - "*.md"
+      - "README.*"
+    reviewers:
+      - "@tech-writing-team"
+    requires_approval: 1
+    
+  core:
+    description: "Core application code"
+    patterns:
+      - "src/core/**"
+      - "packages/core/**"
+    reviewers:
+      - "@core-team"
+      - "@security-team"
+    requires_approval: 2
+    
+  infra:
+    description: "Infrastructure and deployment"
+    patterns:
+      - "infra/**"
+      - ".github/workflows/**"
+      - "*.yml"
+      - "Dockerfile"
+    reviewers:
+      - "@platform-team"
+    requires_approval: 2
+    emergency_approval_override: true
+    
+  database:
+    description: "Database schema and migrations"
+    patterns:
+      - "migrations/**"
+      - "schema/**"
+    reviewers:
+      - "@dba-team"
+      - "@security-team"
+    requires_approval: 3
+    requires_rollback_script: true
+    
+  security:
+    description: "Security-sensitive code"
+    patterns:
+      - "src/auth/**"
+      - "src/security/**"
+      - "packages/auth/**"
+    reviewers:
+      - "@security-team"
+    requires_approval: 3
+    requires_security_audit: true
+
+# Intent validation rules
+validation:
+  justification:
+    min_length: 100
+    required_sections:
+      - "CONTEXT"
+      - "DECISION"
+  
+  counterfactuals:
+    min_count: 1
+  
+  time_bounds:
+    max_duration_days: 90
+    warn_before_expiry_days: 7
+  
+  emergency_mode:
+    max_duration_hours: 72
+    requires_incident_id: true
+    requires_postmortem: true
+
+# Integration settings
+integrations:
+  github:
+    enabled: true
+    app_id: "your-app-id"
+    
+  slack:
+    enabled: false
+    webhook_url: "https://hooks.slack.com/..."
+    notify_on:
+      - "intent_expiring"
+      - "emergency_mode_activated"
+      - "counterfactual_triggered"
+  
+  jira:
+    enabled: false
+    url: "https://your-org.atlassian.net"
+    project_key: "PROJ"
+
+# Corporate Integrity Index (CII) settings
+cii:
+  enabled: true
+  public_badge: true
+  scoring:
+    intent_compliance_weight: 0.3
+    justification_quality_weight: 0.2
+    scope_discipline_weight: 0.2
+    time_management_weight: 0.15
+    counterfactual_maturity_weight: 0.15

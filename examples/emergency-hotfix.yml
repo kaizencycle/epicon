@@ -1,0 +1,40 @@
+# Emergency Hotfix Example
+# Use this template for production incidents
+
+EPICON INTENT PUBLICATION
+
+ledger_id: myorg:myproject:emergency-hotfix-incident-123
+scope: core
+mode: emergency
+issued_at: 2025-12-22T03:00:00Z
+expires_at: 2025-12-25T03:00:00Z  # Max 72 hours
+
+emergency_scope: |
+  PRODUCTION INCIDENT: Brief description
+  Severity: P0/P1/P2
+  Incident ticket: INC-12345
+  Started: 2025-12-22T03:00:00Z
+  Affected users: ~1000
+
+justification: |
+  Emergency hotfix to address critical production issue.
+  
+  INCIDENT:
+  - What broke?
+  - What's the user impact?
+  - How was it discovered?
+  
+  HOTFIX:
+  - What's the temporary fix?
+  - Why is this safe to deploy now?
+  - What's the proper fix we need to implement?
+  
+  ROOT CAUSE:
+  - What caused this? (if known)
+  - How do we prevent this in the future?
+
+counterfactuals:
+  - If incident not resolved in 72h, escalate to architecture team
+  - If this causes new errors, rollback immediately
+  - If root cause identified, replace with proper fix within 7 days
+  - Post-incident review required within 48h of resolution

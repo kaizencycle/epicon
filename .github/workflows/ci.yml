@@ -1,0 +1,164 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run linting
+        run: npm run lint
+
+  type-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Type check
+        run: npm run type-check
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run tests
+        run: npm test
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        if: always()
+        with:
+          files: ./coverage/coverage-final.json
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, type-check, test]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build
+        run: npm run build
+
+  # Dogfooding: Check for EPICON intent in PR description
+  epicon-check:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Check for EPICON Intent
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const body = pr.body || '';
+            
+            // Check if PR contains EPICON intent block
+            const hasIntent = body.includes('EPICON INTENT PUBLICATION');
+            
+            if (!hasIntent) {
+              core.setFailed('❌ PR is missing EPICON intent publication. We dogfood our own product!');
+              
+              // Post comment with template
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: `## 🛡️ EPICON Intent Required
+
+This PR is missing an EPICON intent publication. We dogfood our own product!
+
+Please add this to your PR description:
+
+\`\`\`yaml
+EPICON INTENT PUBLICATION
+
+ledger_id: epicon:contributor:${pr.head.ref}
+scope: core | docs | tests | infra
+mode: normal
+issued_at: ${new Date().toISOString()}
+expires_at: ${new Date(Date.now() + 30*24*60*60*1000).toISOString()}
+
+justification: |
+  [Explain WHY this change is needed]
+  
+  CONTEXT: [What problem does this solve?]
+  DECISION: [What approach did you choose?]
+  IMPACT: [Who/what does this affect?]
+  
+counterfactuals:
+  - If this breaks CI, revert
+  - If tests fail, investigate before merge
+\`\`\`
+
+Learn more: https://epicon.dev/docs/intent-publication`
+              });
+              
+              return;
+            }
+            
+            // Validate intent structure (basic check)
+            const hasLedgerId = body.includes('ledger_id:');
+            const hasScope = body.includes('scope:');
+            const hasJustification = body.includes('justification:');
+            const hasCounterfactuals = body.includes('counterfactuals:');
+            
+            if (!hasLedgerId || !hasScope || !hasJustification || !hasCounterfactuals) {
+              core.setFailed('❌ EPICON intent is incomplete. Missing required fields.');
+              return;
+            }
+            
+            // Success!
+            core.info('✅ EPICON intent publication found and validated');
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              body: `## ✅ EPICON Intent Valid
+
+Great job dogfooding! Your intent publication looks good.
+
+**Dogfooding Level: 💯**`
+            });

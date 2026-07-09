@@ -3,397 +3,195 @@
 **Git commits tell you WHAT changed. EPICON tells you WHY.**
 
 [![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue)](./LICENSE)
-[![Product: Mobius Systems](https://img.shields.io/badge/Product-Mobius%20Systems-6E00FF)](https://mobius.systems)
-[![Status: Pre-Launch](https://img.shields.io/badge/Status-Pre--Launch-orange)](https://epicon.dev)
+[![Part of: Mobius Substrate](https://img.shields.io/badge/Mobius-Substrate-6E00FF)](https://mobius-substrate.com)
+[![GitHub Action: v1](https://img.shields.io/badge/GitHub%20Action-v1-2ea44f)](https://github.com/kaizencycle/epicon)
+
+> **No consequential action without recorded intent.**
+> Mobius is the constitutional witness, not the actor.
 
 ---
 
-## 🎯 What is EPICON Guard?
+## What is EPICON?
 
-**EPICON Guard** is the world's first **Intent Accountability Layer** for Git, developed by [Mobius Systems](https://mobius.systems). It transforms version control from "what changed" to "why it changed" by requiring structured justifications for every code modification.
+EPICON is the Mobius Substrate constitutional principle that no consequential
+action may occur without recorded intent. **EPICON Guard** is its first
+enforcement surface: a GitHub Action that validates a structured **Intent
+Publication** in every pull request and classifies the PR into a consequence
+tier before merge.
 
-### The Problem
+Traditional Git tracks **what** changed, **when**, and **who**. It does not
+track **why** it changed, **when the authority to change it expires**, or
+**what would make you revert**. EPICON Guard adds that layer.
 
-Traditional Git tracks:
-- ✅ **WHAT** changed
-- ✅ **WHEN** it changed
-- ✅ **WHO** changed it
+The protocol does not prevent actions. It makes divergence legible,
+attributable, and time-bound.
 
-But not:
-- ❌ **WHY** it changed
-- ❌ **WHEN** should it expire
-- ❌ **WHAT** would make us revert
+---
 
-### The Solution
+## What ships today: the GitHub Action
 
-EPICON Guard adds the missing accountability layer:
+Add five lines to any repo:
 
 ```yaml
-EPICON INTENT PUBLICATION
+# .github/workflows/epicon-guard.yml
+name: EPICON Guard
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+permissions:
+  contents: read
+  pull-requests: read
+jobs:
+  epicon:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: kaizencycle/epicon@v1
+```
 
-ledger_id: acme:payments:stripe-integration
+Then include an intent block in your PR body:
+
+````markdown
+```intent
+epicon_id: EPICON_C-367_CORE_stripe-integration_v1
+ledger_id: your-github-username
 scope: core
 mode: normal
-issued_at: 2025-12-22T16:00:00Z
-expires_at: 2026-01-22T16:00:00Z
-
-justification: |
-  Adding Stripe payment integration for credit card processing.
-  
-  CONTEXT: Current provider (Braintree) has 2.9% fees
-  DECISION: Stripe offers 2.4% fees + better fraud detection
-  IMPACT: Projected savings of $50k/year
-  
+issued_at: 2026-07-09T00:00:00Z
+expires_at: 2026-08-09T00:00:00Z
+justification:
+  VALUES INVOKED: integrity, transparency, cost-efficiency
+  REASONING: Current provider fees are 2.9%; Stripe offers 2.4% plus
+    stronger fraud detection. Projected savings $50k/year.
+  ANCHORS:
+    - Provider fee schedules (public pricing pages)
+    - Internal fraud-rate benchmarks, Q2 report
+  BOUNDARIES: Does not apply to invoicing or payout flows
+  COUNTERFACTUAL: If fraud rate rises above 0.5%, this justification fails
 counterfactuals:
   - If fraud rate increases >0.5%, revert
-  - If A/B test shows worse conversion, stay with Braintree
-  - If users report payment issues, disable
+  - If A/B test shows worse conversion, stay with current provider
 ```
+````
 
-**Result:** Every code change has documented reasoning, time-bounded authority, and clear success criteria.
+To make the gate binding, mark **Intent Publication Gate** as a required
+status check in branch protection. That is the moment EPICON becomes a
+precondition gate rather than an audit log.
 
 ---
 
-## 🌟 Key Features
+## What it enforces
 
-### 1. Intent Publication
-Every PR requires a structured justification block explaining WHY, WHAT, HOW, and WHEN.
+Every check maps to a named invariant from
+[EPICON-02 (Intent Publication & Divergence Protocol)](https://github.com/kaizencycle/Mobius-Substrate/blob/main/docs/epicon/EPICON-02.md):
 
-### 2. Scope Enforcement
-Changes are limited to declared scope. Security engineers can't accidentally touch payment code.
+| # | Invariant | Enforcement |
+|---|---|---|
+| I1 | Intent must precede authority | Intent block required; missing intent fails consequential PRs |
+| I2 | Intent immutable once published | `justification_hash` (SHA-256) emitted as a witness |
+| I3 | Authority scoped and time-bounded | `scope` enum + `issued_at` / `expires_at` validated |
+| I4 | Divergence observable, not blocked | Files outside the scope envelope are flagged, never blocked |
+| I5 | Expiration is mandatory | Missing or past `expires_at` fails; re-publication required |
+| I6 | No narrative substitutes verification | Structured justification required — prose never passes the gate |
 
-### 3. Time-Bounded Authority
-All access grants expire automatically. No more zombie permissions or forgotten temporary fixes.
+### Consequence tiers
 
-### 4. Counterfactual Conditions
-Clear success criteria: "If X happens, then do Y." Removes ambiguity about when to revert.
+PRs are classified **EP-1 / EP-2 / EP-3** per the
+[EPICON Tiering Specification](https://github.com/kaizencycle/Mobius-Substrate/blob/main/docs/specs/EPICON_TIERING_SPEC_v0.1.md):
 
-### 5. Corporate Integrity Index (CII)
-Organizations receive an integrity score based on their engineering practices.
+- **Rule 5.1** — tier is computed from a declarative path registry, never from
+  the proposer's self-assessment. The PR's own Risk Tier checkboxes are advisory.
+- **Rule 5.2** — paths matching no registry pattern classify EP-3.
+  Deny-by-default: unknown ≠ harmless.
+- **Rule 5.3** — PR tier = the maximum tier across all changed files.
+- **Failure matrix (§8)** — EP-1 fails open with honest backfill marking;
+  EP-2 quarantines; EP-3 fails closed.
 
-### 6. AI Integration (Roadmap)
-Intent AI suggests justifications based on code changes. "Copilot for intent."
+Override the default registry by committing `.github/epicon-policy.json` —
+see [`policy/epicon-policy.example.json`](./policy/epicon-policy.example.json).
 
----
+### Outputs
 
-## 🚀 Quick Start
-
-### For Developers
-
-**1. Install GitHub App**
-```bash
-# Visit github.com/apps/epicon-guard
-# Click "Install" and authorize repos
-```
-
-**2. Add Intent Block to PR**
-```yaml
-EPICON INTENT PUBLICATION
-
-ledger_id: myorg:myrepo:feature-name
-scope: core | docs | infra | tests
-mode: normal | emergency
-issued_at: 2025-12-22T10:00:00Z
-expires_at: 2026-01-22T10:00:00Z
-
-justification: |
-  Your explanation here...
-  
-counterfactuals:
-  - If condition, then action
-```
-
-**3. EPICON Validates**
-```
-✅ Intent Publication Valid
-✅ Scope Aligned
-✅ Time-Bounded
-✅ Counterfactuals Present
-
-Intent Quality Score: 92/100
-```
+`tier` · `status` (`PASS | PASS_WITH_BACKFILL | QUARANTINE | FAIL_CLOSED`) ·
+`epicon_id` · `justification_hash` · `divergence_count` — consumable by
+downstream workflow steps.
 
 ---
 
-## 🏢 For Organizations
+## Source of truth
 
-### Installation
+The Action implements — it does not define. Canon lives in the Mobius
+Substrate monorepo:
 
-**GitHub Organization:**
-```bash
-1. Install EPICON Guard GitHub App
-2. Configure scope rules (.epicon/config.yml)
-3. Set team permissions
-4. Enable dashboard access
-```
-
-**Self-Hosted Option:**
-```bash
-docker-compose up -d
-# See docs/self-hosted-setup.md
-```
-
-### Dashboard Access
-
-Monitor your organization's integrity:
-- 🔴 Expired intents requiring action
-- 🟡 Intents expiring soon
-- 🟢 Active intents by scope
-- 📊 Corporate Integrity Index (CII)
-- 📈 Trends over time
+- [`docs/epicon/`](https://github.com/kaizencycle/Mobius-Substrate/tree/main/docs/epicon) — EPICON-01/02/03 specifications, EJ schema, templates
+- [`docs/specs/EPICON_TIERING_SPEC_v0.1.md`](https://github.com/kaizencycle/Mobius-Substrate/blob/main/docs/specs/EPICON_TIERING_SPEC_v0.1.md) — EP-1/2/3 grammar
+- [`schemas/epicon_constitutional_v1.schema.json`](https://github.com/kaizencycle/Mobius-Substrate/blob/main/schemas/epicon_constitutional_v1.schema.json) — ledger commitment schema
 
 ---
 
-## 📊 Corporate Integrity Index (CII)
+## Status
 
-EPICON grades your organization's engineering integrity:
+| Component | Status |
+|-----------|--------|
+| GitHub Action (Intent Publication Gate) | ✅ Live — `kaizencycle/epicon@v1` |
+| Landing site (GitHub Pages) | ✅ Live |
+| GitHub App (Checks API, intent immutability, `/epicon revalidate`) | 🔄 Roadmap — v1 |
+| CPC ledger attestation (EP-3 constitutional commitments) | 🔄 Roadmap — v2 |
+| Dashboard / Corporate Integrity Index (CII) | 💡 Concept |
+| GitLab / Jira / Slack integrations | 💡 Concept |
+
+If it isn't marked ✅, it doesn't exist yet. This README does not sell futures.
+
+---
+
+## Repository layout
 
 ```
-Overall Score: 87/100 (A-)
-├─ Intent Compliance: 94%
-├─ Justification Quality: 88/100
-├─ Scope Discipline: 91%
-├─ Time Management: 82%
-├─ Counterfactual Maturity: 85%
-└─ Emergency Usage: 89%
+action.yml          # Composite action — the consumable entrypoint
+src/validate.mjs    # Zero-dependency validator (Node ≥ 20)
+policy/             # Example tier policy registry
+examples/           # Consumer workflow for adopting repos
+test/               # Fixtures + classifier tests
+docs/               # Product spec and intent records
+website/            # Landing page (GitHub Pages)
 ```
 
-**Display Your Badge:**
-```html
-<img src="https://img.shields.io/endpoint?url=https://epicon.dev/api/badge/yourorg" />
-```
-
-**Why Companies Display CII:**
-- 🏅 Recruiting: "We're a top 10% integrity company"
-- 💼 Sales: "Our engineering practices are certified"
-- 📈 Investors: "We have governance maturity"
-
 ---
 
-## 💰 Pricing
-
-### Free Tier
-- ✅ Public repos
-- ✅ Intent validation
-- ✅ Basic audit logs (30 days)
-- ✅ Community support
-
-### Pro Tier ($10/user/month)
-- ✅ Private repos (unlimited)
-- ✅ Advanced audit logs (1 year)
-- ✅ Custom scope rules
-- ✅ Slack/Teams integration
-- ✅ CII scoring
-
-### Enterprise Tier ($50/user/month)
-- ✅ SSO/SAML
-- ✅ Unlimited audit retention
-- ✅ Compliance reports (SOC 2, HIPAA)
-- ✅ On-premise deployment
-- ✅ Dedicated support
-
-### Government Tier (Custom)
-- ✅ FedRAMP certified
-- ✅ Air-gapped deployment
-- ✅ Clearance-aware controls
-- ✅ 24/7 support
-
-[View Full Pricing →](https://epicon.dev/pricing)
-
----
-
-## 🎓 Use Cases
-
-### Junior Developers
-"I can read the intent and understand the original decision."
-
-### Senior Engineers
-"Future me will thank me for documenting my reasoning."
-
-### Engineering Managers
-"I have visibility into which temporary fixes became permanent."
-
-### Enterprises
-"SOC 2 audits went from 40 hours to 2 hours of prep."
-
-### Universities
-"Students learn to justify technical decisions, not just write code."
-
-### Government
-"Complete audit trail for clearance-aware access controls."
-
----
-
-## 🔌 Integrations
-
-- ✅ **GitHub** - Native app integration
-- ✅ **GitLab** - CI/CD pipeline
-- ✅ **Jira** - Automatic ticket linking
-- ✅ **Slack** - Real-time notifications
-- ✅ **Teams** - Collaboration alerts
-- 🔄 **Bitbucket** - Coming soon
-
----
-
-## 📚 Documentation
-
-- [Getting Started](./docs/getting-started.md)
-- [Intent Publication Guide](./docs/intent-publication.md)
-- [Scope Configuration](./docs/scope-configuration.md)
-- [Counterfactual Patterns](./docs/counterfactual-patterns.md)
-- [API Reference](./docs/api-reference.md)
-- [Self-Hosted Setup](./docs/self-hosted-setup.md)
-- [Corporate Integrity Index](./docs/cii-scoring.md)
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! EPICON Guard is open source (AGPL-3.0).
+## Contributing
 
 ```bash
-git clone https://github.com/epicon-guard/epicon.git
+git clone https://github.com/kaizencycle/epicon.git
 cd epicon
-npm install
-npm run dev
+node test/classify.test.mjs
 ```
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+Every PR to this repo is validated by the Guard it ships. See
+[CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ---
 
-## 🏗️ Architecture
+## About Mobius Substrate
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    EPICON Guard                          │
-├─────────────────────────────────────────────────────────┤
-│  Intent Engine    Validation API    Audit Store         │
-│  Scope Enforcer   Time Checker      CII Calculator      │
-└─────────────────────────────────────────────────────────┘
-                          │
-                ┌─────────┼─────────┐
-                │         │         │
-         ┌──────▼───┐ ┌──▼───┐ ┌──▼────┐
-         │  GitHub  │ │ GitLab│ │  Jira │
-         └──────────┘ └───────┘ └───────┘
-```
+EPICON Guard is part of [Mobius Substrate](https://mobius-substrate.com),
+civic AI governance infrastructure. Mobius is not a data warehouse and not a
+decision-maker — it is a constitutional witness. Decision-making remains with
+humans and authorized systems; EPICON records, gates, and attests.
 
-See [ARCHITECTURE.md](./docs/ARCHITECTURE.md) for details.
+Related components: the Mobius ledger (integrity-backed audit chain), MIC
+(integrity-gated credit), and the sentinel council (ATLAS, ZEUS, EVE, JADE,
+AUREA and roster).
 
 ---
 
-## 🛡️ Security & Privacy
+## License
 
-**What We Store:**
-- ✅ Intent publications
-- ✅ Validation results
-- ✅ Audit logs
-
-**What We DON'T Store:**
-- ❌ Source code
-- ❌ Commit diffs
-- ❌ API keys or secrets
-
-**Compliance:**
-- ✅ SOC 2 Type II (in progress)
-- ✅ GDPR compliant
-- ✅ FedRAMP (government tier)
-
-See [SECURITY.md](./SECURITY.md) for full policy.
-
----
-
-## 📊 Status
-
-| Component | Status | Version |
-|-----------|--------|---------|
-| GitHub App | 🟡 Beta | 0.9.0 |
-| GitLab CI | 🟡 Beta | 0.9.0 |
-| Web Dashboard | 🟡 Beta | 0.9.0 |
-| API | 🟡 Beta | 0.9.0 |
-| Intent AI | 🔴 Roadmap | - |
-| Self-Hosted | 🟡 Beta | 0.9.0 |
-
----
-
-## 🌍 Community
-
-- 🌐 **Website:** [epicon.dev](https://epicon.dev)
-- 💬 **Discussions:** [GitHub Discussions](https://github.com/epicon-guard/epicon/discussions)
-- 🐛 **Issues:** [GitHub Issues](https://github.com/epicon-guard/epicon/issues)
-- 📧 **Email:** hello@epicon.dev
-- 🐦 **Twitter:** [@epiconguard](https://twitter.com/epiconguard)
-- 📝 **Blog:** [blog.epicon.dev](https://blog.epicon.dev)
-
----
-
-## 🎯 Roadmap
-
-### Phase 1: MVP (Q1 2026)
-- ✅ Intent validation engine
-- ✅ GitHub App
-- ✅ Basic dashboard
-- ✅ CII scoring
-
-### Phase 2: Intelligence (Q2 2026)
-- 🔄 Intent AI (suggestions)
-- 🔄 Pattern detection
-- 🔄 GitLab integration
-- 🔄 Jira integration
-
-### Phase 3: Enterprise (Q3 2026)
-- 🔄 SSO/SAML
-- 🔄 Advanced reporting
-- 🔄 Self-hosted option
-- 🔄 Compliance certifications
-
-### Phase 4: Autopilot (Q4 2026)
-- 🔄 Intent Autopilot
-- 🔄 Counterfactual monitoring
-- 🔄 Automated remediation
-
----
-
-## 🏢 About Mobius Systems
-
-EPICON Guard is developed by [Mobius Systems](https://mobius.systems), creators of the world's first AI Operating System for Civilization.
-
-**Mobius Mission:** Build governance infrastructure for safe AGI deployment.
-
-**Other Mobius Products:**
-- 🛡️ **EPICON Guard** - Intent accountability for Git
-- 📋 **Mobius Ledger** - Integrity-backed audit log
-- 💎 **MIC Economy** - Integrity-linked currency
-
-[Learn more about Mobius →](https://mobius.systems)
-
----
-
-## 📜 License
-
-AGPL-3.0 with Ethical Addendum
-
-See [LICENSE](./LICENSE) for details.
-
----
-
-## 🙏 Acknowledgments
-
-Built with integrity by the Mobius Systems team:
-- **Michael (Kaizen)** - Founder & Architect
-- **ATLAS** - Infrastructure & Operations
-- **AUREA** - Integrity Sentinel
-- **EVE** - Ethics Engine
-- **JADE** - Morale Anchor
-- **HERMES** - Market & Signals
-
-Special thanks to all early adopters and contributors.
+[AGPL-3.0](./LICENSE). The EPICON specifications in Mobius-Substrate are
+CC0 1.0 (public domain) — the protocol is free for anyone to implement;
+this implementation is copyleft.
 
 ---
 
 **🛡️ Git commits tell you WHAT changed. EPICON tells you WHY.**
 
----
-
-*Built by [Mobius Systems](https://mobius.systems) | [epicon.dev](https://epicon.dev)*
+*Built by [kaizencycle](https://github.com/kaizencycle) · [Mobius Substrate](https://mobius-substrate.com) · "We heal as we walk."*

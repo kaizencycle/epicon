@@ -17,27 +17,58 @@
 import { createServer as createHttpServer } from 'node:http';
 import { handleWebhook, WEBHOOK_PATH } from './handler.mjs';
 
-const MAX_BODY_BYTES = 5 * 1024 * 1024; // GitHub caps webhook payloads at ~25MB; 5MB is safely generous here.
+// GitHub caps webhook payloads at 25 MB and does not send larger deliveries, so
+// the endpoint must accept the full documented size or valid deliveries (e.g. a
+// large installation_repositories event) would be rejected before signature
+// verification and GitHub would retry. 25 MiB (> 25 MB) is a safe default;
+// override with MAX_WEBHOOK_BODY_BYTES if needed.
+// Ref: https://docs.github.com/en/webhooks/webhook-events-and-payloads#payload-cap
+export const DEFAULT_MAX_BODY_BYTES = 25 * 1024 * 1024;
 
-function readRawBody(req) {
+function resolveMaxBodyBytes() {
+  const fromEnv = Number(process.env.MAX_WEBHOOK_BODY_BYTES);
+  return Number.isFinite(fromEnv) && fromEnv > 0 ? fromEnv : DEFAULT_MAX_BODY_BYTES;
+}
+
+class PayloadTooLargeError extends Error {}
+
+function readRawBody(req, maxBodyBytes) {
   return new Promise((resolve, reject) => {
     const chunks = [];
     let size = 0;
-    req.on('data', (chunk) => {
+    let settled = false;
+    const done = (fn, arg) => {
+      if (settled) return;
+      settled = true;
+      req.removeListener('data', onData);
+      req.removeListener('end', onEnd);
+      req.removeListener('error', onErr);
+      fn(arg);
+    };
+    const onData = (chunk) => {
       size += chunk.length;
-      if (size > MAX_BODY_BYTES) {
-        reject(new Error('payload too large'));
-        req.destroy();
+      if (size > maxBodyBytes) {
+        // Stop buffering and let the caller respond 413. We do not destroy the
+        // socket here so a clean HTTP response can still be written.
+        req.pause();
+        done(reject, new PayloadTooLargeError('payload too large'));
         return;
       }
       chunks.push(chunk);
-    });
-    req.on('end', () => resolve(Buffer.concat(chunks)));
-    req.on('error', reject);
+    };
+    const onEnd = () => done(resolve, Buffer.concat(chunks));
+    const onErr = (err) => done(reject, err);
+    req.on('data', onData);
+    req.on('end', onEnd);
+    req.on('error', onErr);
   });
 }
 
-export function createServer({ secret = process.env.GITHUB_WEBHOOK_SECRET, logger = console } = {}) {
+export function createServer({
+  secret = process.env.GITHUB_WEBHOOK_SECRET,
+  logger = console,
+  maxBodyBytes = resolveMaxBodyBytes(),
+} = {}) {
   return createHttpServer(async (req, res) => {
     const path = (req.url || '/').split('?')[0];
 
@@ -51,10 +82,10 @@ export function createServer({ secret = process.env.GITHUB_WEBHOOK_SECRET, logge
     let rawBody = Buffer.alloc(0);
     if (req.method === 'POST') {
       try {
-        rawBody = await readRawBody(req);
+        rawBody = await readRawBody(req, maxBodyBytes);
       } catch (err) {
         logger.warn(`[epicon-webhook] body read failed: ${err.message} → 413`);
-        res.writeHead(413, { 'content-type': 'application/json' });
+        res.writeHead(413, { 'content-type': 'application/json', connection: 'close' });
         res.end(JSON.stringify({ ok: false, error: 'payload too large' }));
         return;
       }

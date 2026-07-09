@@ -166,6 +166,29 @@ async function main() {
     await new Promise((r) => insecure.close(r));
   }
 
+  // 13. Large valid payload (above the old 5 MB cap) accepted under the default
+  //     25 MiB limit → 200. Guards against rejecting big GitHub deliveries.
+  {
+    const big = 'x'.repeat(6 * 1024 * 1024); // 6 MiB
+    const p = JSON.stringify({ action: 'added', installation: { id: 1 }, repositories_added: [{ full_name: 'a/b', note: big }] });
+    const res = await post(p, { event: 'installation_repositories', delivery: 'big-ok' });
+    check('POST 6 MiB valid payload (default 25 MiB limit) → 200', res.status === 200, `got ${res.status}`);
+  }
+
+  // 14. Payload above a configured limit → 413 (limit is enforceable/injectable).
+  {
+    const small = createServer({ secret: SECRET, logger, maxBodyBytes: 1024 });
+    await new Promise((r) => small.listen(0, '127.0.0.1', r));
+    const p = JSON.stringify({ action: 'created', installation: { id: 1 }, blob: 'y'.repeat(4096) });
+    const res = await fetch(`http://127.0.0.1:${small.address().port}/api/github/webhook`, {
+      method: 'POST',
+      headers: { 'x-github-event': 'installation', 'x-hub-signature-256': sign(p) },
+      body: p,
+    });
+    check('POST body over configured limit → 413', res.status === 413, `got ${res.status}`);
+    await new Promise((r) => small.close(r));
+  }
+
   await new Promise((r) => server.close(r));
 
   console.log(`\n${pass}/${pass + fail} webhook checks pass`);

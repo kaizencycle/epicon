@@ -9,7 +9,11 @@ services:
   - type: web
     name: epicon-github-webhook
     runtime: node
-    plan: free
+    # Must be an always-on plan. GitHub requires a 2xx within ~10s, but a Free
+    # web service spins down after 15 min idle and cold-starts in ~1 min, so the
+    # first delivery after an idle period would time out and GitHub would record
+    # a failed delivery. Use starter (or larger) — or any always-on host.
+    plan: starter
     rootDir: packages/github-app
     buildCommand: npm install
     startCommand: node src/server.mjs
@@ -19,3 +23,6 @@ services:
       # Set this in the Render dashboard — must match the GitHub App's secret.
       - key: GITHUB_WEBHOOK_SECRET
         sync: false
+      # Optional: override the 25 MiB default webhook body cap if ever needed.
+      # - key: MAX_WEBHOOK_BODY_BYTES
+      #   value: "26214400"

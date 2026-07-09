@@ -22,6 +22,7 @@ Canonical URL: `https://epicon.mobius-substrate.com/api/github/webhook`
 | Invalid / missing signature | `401 { "ok": false, "error": "invalid signature" }` |
 | Non-`POST` method on the webhook path | `405` with `Allow: POST` |
 | Unknown path | `404` |
+| Body larger than the size cap | `413` (default cap 25 MiB — GitHub's payload max — override with `MAX_WEBHOOK_BODY_BYTES`) |
 | `GITHUB_WEBHOOK_SECRET` not configured | `500` (fail closed, logged) |
 
 Events explicitly acknowledged and logged: `ping`, `installation`
@@ -68,6 +69,11 @@ The service binds `0.0.0.0:$PORT`, so it also runs unchanged on Fly, Railway,
 or any container host. Set `GITHUB_WEBHOOK_SECRET` to the same secret configured
 on the GitHub App, and point the App's webhook URL at
 `https://<host>/api/github/webhook`.
+
+Deploy on an **always-on** plan: GitHub expects a `2xx` within ~10s, so a host
+that spins down when idle (e.g. Render Free) will time out the first delivery
+after an idle period while it cold-starts. The blueprint uses `plan: starter`
+for this reason.
 
 ## License
 

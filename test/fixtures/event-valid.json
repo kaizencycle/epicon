@@ -1,0 +1,6 @@
+{
+  "pull_request": {
+    "number": 1,
+    "body": "# Mobius PR — Cycle\n\n## 3. EPICON Intent\n```intent\nepicon_id: EPICON_C-367_CI_epicon-guard-action_v1\nledger_id: kaizencycle\nscope: ci\nmode: normal\nissued_at: 2026-07-09T00:00:00Z\nexpires_at: 2026-10-07T00:00:00Z\njustification:\n  VALUES INVOKED: integrity, transparency, accountability\n  REASONING: Close the gap between constitutional claim and runtime behavior\n  ANCHORS:\n    - docs/epicon/EPICON-02.md\n    - docs/specs/EPICON_TIERING_SPEC_v0.1.md\n  BOUNDARIES: PR-boundary enforcement only\n  COUNTERFACTUAL: If tiering spec fails quorum, revise validators\ncounterfactuals:\n  - If tests fail, do not merge\n  - If false FAIL_CLOSED verdicts occur, switch to warn mode\n```\n"
+  }
+}

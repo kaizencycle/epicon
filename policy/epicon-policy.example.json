@@ -1,0 +1,24 @@
+{
+  "$comment": "Per-repo EPICON tier policy registry. Place at .github/epicon-policy.json to override the Action's defaults. Tier classification is declarative and independent of the acting agent (EPICON_TIERING_SPEC Rule 5.1). Paths matching no pattern classify EP-3 (Rule 5.2 deny-by-default). PR tier = max tier across changed files (Rule 5.3). Patterns support ** and * globs; higher tiers are evaluated first.",
+  "policy_id": "cpc-ledger-policy-v1",
+  "EP-1": [
+    "docs/**",
+    "**/*.md",
+    ".github/ISSUE_TEMPLATE/**"
+  ],
+  "EP-2": [
+    "apps/**",
+    "packages/**",
+    "test/**",
+    "package.json"
+  ],
+  "EP-3": [
+    "ledger/**",
+    "identity/**",
+    "wallet/**",
+    "schemas/**",
+    ".github/workflows/**",
+    "CODEOWNERS",
+    "SECURITY.md"
+  ]
+}

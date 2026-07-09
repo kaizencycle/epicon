@@ -1,0 +1,33 @@
+# Drop this into any repo as .github/workflows/epicon-guard.yml
+# Five lines of substance: no consequential merge without recorded intent.
+#
+# Federation rollout order (suggested):
+#   1. Mobius-Substrate           (canon — EP-3 surfaces live here)
+#   2. Civic-Protocol-Core        (ledger/identity — EP-3)
+#   3. mobius-civic-ai-terminal   (EP-2 heavy)
+#   4. mobius-hive                (EP-2, world-state)
+#   5. mobius-browser-shell       (EP-1/EP-2)
+#
+# Then make "Intent Publication Gate" a required status check in branch
+# protection on main — that is the moment EPICON becomes a precondition gate
+# rather than an audit log.
+
+name: EPICON Guard
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  epicon:
+    name: Intent Publication Gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4   # optional; enables .github/epicon-policy.json override
+      - uses: kaizencycle/epicon@v1
+        with:
+          mode: enforce             # use "warn" during migration, then flip

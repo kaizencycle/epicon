@@ -1,0 +1,6 @@
+{
+  "pull_request": {
+    "number": 2,
+    "body": "Quick fix, trust me.\n```intent\nepicon_id: EPICON_bad_id\nscope: everything\nissued_at: 2026-07-09T00:00:00Z\nexpires_at: 2026-07-01T00:00:00Z\njustification:\n  REASONING: because\n```\n"
+  }
+}

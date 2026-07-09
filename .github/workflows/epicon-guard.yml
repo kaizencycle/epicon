@@ -1,0 +1,33 @@
+# EPICON Guard — self-enforcement (the epicon repo dogfoods its own gate)
+name: EPICON Guard
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  epicon:
+    name: Intent Publication Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (policy registry lookup)
+        uses: actions/checkout@v4
+
+      # In the epicon repo itself we reference the local action.
+      # Federation repos use: kaizencycle/epicon@v1
+      - name: EPICON Guard
+        id: guard
+        uses: ./
+        with:
+          github-token: ${{ github.token }}
+          mode: enforce
+
+      - name: Verdict
+        run: |
+          echo "tier=${{ steps.guard.outputs.tier }}"
+          echo "status=${{ steps.guard.outputs.status }}"
+          echo "justification_hash=${{ steps.guard.outputs.justification_hash }}"

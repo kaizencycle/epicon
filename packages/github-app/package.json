@@ -1,0 +1,22 @@
+{
+  "name": "@epicon-guard/github-app",
+  "version": "0.1.0",
+  "description": "EPICON Guard GitHub App webhook endpoint (zero-dependency Node service).",
+  "private": true,
+  "type": "module",
+  "license": "AGPL-3.0",
+  "main": "src/handler.mjs",
+  "exports": {
+    ".": "./src/handler.mjs",
+    "./server": "./src/server.mjs",
+    "./verify": "./src/verify.mjs"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node src/server.mjs",
+    "dev": "node --watch src/server.mjs",
+    "test": "node test/webhook.test.mjs"
+  }
+}

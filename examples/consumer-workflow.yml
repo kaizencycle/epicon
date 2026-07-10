@@ -1,5 +1,5 @@
 # Drop this into any repo as .github/workflows/epicon-guard.yml
-# Five lines of substance: no consequential merge without recorded intent.
+# Three lines of substance: no consequential merge without recorded intent.
 #
 # Federation rollout order (suggested):
 #   1. Mobius-Substrate           (canon — EP-3 surfaces live here)
@@ -27,7 +27,7 @@ jobs:
     name: Intent Publication Gate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4   # optional; enables .github/epicon-policy.json override
-      - uses: kaizencycle/epicon@v1
+      - uses: kaizencycle/epicon@v1.1
         with:
           mode: enforce             # use "warn" during migration, then flip
+          policy-ref: base          # trusted tier policy from PR base SHA; no checkout needed

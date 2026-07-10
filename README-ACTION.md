@@ -1,4 +1,4 @@
-# EPICON Guard — GitHub Action (v0)
+# EPICON Guard — GitHub Action
 
 > **No consequential action without recorded intent.**
 > Mobius is the constitutional witness, not the actor.
@@ -12,7 +12,7 @@ Source of truth: [`Mobius-Substrate/docs/epicon`](https://github.com/kaizencycle
 — specifically EPICON-02 (IPDP), `EPICON_TIERING_SPEC_v0.1`, and
 `epicon_constitutional_v1.schema.json`.
 
-## Install (any repo, five lines)
+## Install (any repo, three lines)
 
 ```yaml
 # .github/workflows/epicon-guard.yml
@@ -27,9 +27,18 @@ jobs:
   epicon:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: kaizencycle/epicon@v1
+      - uses: kaizencycle/epicon@v1.1
+        with:
+          mode: enforce
+          policy-ref: base
 ```
+
+No `actions/checkout` required — `policy-ref: base` (the default on
+`pull_request` events) loads the trusted tier registry from the PR's base SHA
+via the GitHub Contents API, so a PR can't weaken its own classification by
+editing `.github/epicon-policy.json` in the same diff. See
+[`docs/releases/v1.1.md`](./docs/releases/v1.1.md) for the migration from
+`@v1` and the `policy-ref` / `policy-path` inputs.
 
 Then add an ` ```intent ` block to your PR body (the
 [Mobius PR template](https://github.com/kaizencycle/Mobius-Substrate/blob/main/.github/PULL_REQUEST_TEMPLATE.md)
@@ -69,9 +78,10 @@ downstream steps (e.g. future CPC ledger attestation).
 
 ## Roadmap
 
-- **v0 (this)** — GitHub Action: PR-boundary validation, tier classification, divergence flagging
-- **v1** — GitHub App (Probot): Checks API, intent-immutability enforcement across `edited` events, `/epicon revalidate` commands, org-wide installation tokens (retiring PATs)
-- **v2** — CPC ledger attestation: valid intents immortalized via `/ledger/attest`, constitutional EPICON commitments for EP-3 merges
+- **v1** — GitHub Action: PR-boundary validation, tier classification, divergence flagging
+- **v1.1 (this)** — trusted `policy-ref: base` tier loading; closes the same-diff self-downgrade bypass
+- **v2** — GitHub App (Probot): Checks API, intent-immutability enforcement across `edited` events, `/epicon revalidate` commands, org-wide installation tokens (retiring PATs)
+- **v3** — CPC ledger attestation: valid intents immortalized via `/ledger/attest`, constitutional EPICON commitments for EP-3 merges
 
 ## License
 

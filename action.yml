@@ -17,6 +17,18 @@ inputs:
     description: "enforce (fail the check on QUARANTINE/FAIL_CLOSED) or warn (report only)."
     required: false
     default: "enforce"
+  policy-ref:
+    description: >-
+      Git ref for the trusted tier policy. "base" (default on pull_request) loads
+      .github/epicon-policy.json from the PR base SHA via the GitHub API so the
+      proposer cannot weaken classification in the same PR. "workspace" reads
+      from the checkout. Any other value is an explicit ref or SHA.
+    required: false
+    default: ""
+  policy-path:
+    description: "Repository path to the tier policy JSON file."
+    required: false
+    default: ".github/epicon-policy.json"
 
 outputs:
   tier:
@@ -44,4 +56,6 @@ runs:
       env:
         INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}
         INPUT_MODE: ${{ inputs.mode }}
+        INPUT_POLICY_REF: ${{ inputs.policy-ref }}
+        INPUT_POLICY_PATH: ${{ inputs.policy-path }}
       run: node "${{ github.action_path }}/src/validate.mjs"

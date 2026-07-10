@@ -355,17 +355,77 @@ function globMatch(pattern, path) {
   return rx.test(path);
 }
 
-function loadPolicy() {
-  const override = join(process.env.GITHUB_WORKSPACE || '.', '.github', 'epicon-policy.json');
-  if (existsSync(override)) {
-    try {
-      const p = JSON.parse(readFileSync(override, 'utf8'));
-      note(`Tier policy loaded from .github/epicon-policy.json (${p.policy_id || 'unnamed'}).`);
-      return p;
-    } catch {
-      warn('Unparseable .github/epicon-policy.json — falling back to default registry.');
-    }
+const DEFAULT_POLICY_PATH = '.github/epicon-policy.json';
+
+function parsePolicyJson(raw, source) {
+  try {
+    return JSON.parse(raw);
+  } catch {
+    warn(`Unparseable policy JSON (${source}) — falling back to default registry.`);
+    return null;
   }
+}
+
+// v1.1 — Codex P1: a PR could weaken its own tier registry by editing
+// .github/epicon-policy.json in the same diff the Guard was supposed to
+// classify. Default behavior on pull_request events now loads the policy
+// from the PR *base* SHA via the Contents API, so the proposer cannot
+// self-downgrade classification. "workspace" restores v1 filesystem reads.
+/** @param {string} policyRefInput @param {{ base?: { sha?: string } } | null} pullRequest */
+function resolvePolicyRef(policyRefInput, pullRequest) {
+  const ref = (policyRefInput || '').trim().toLowerCase();
+  if (ref === 'workspace' || ref === 'head') return 'workspace';
+  if (ref === 'base') return pullRequest?.base?.sha ? `git:${pullRequest.base.sha}` : 'workspace';
+  if (!ref) return pullRequest?.base?.sha ? `git:${pullRequest.base.sha}` : 'workspace';
+  return `git:${policyRefInput.trim()}`;
+}
+
+function loadPolicyFromWorkspace(policyPath) {
+  const override = join(process.env.GITHUB_WORKSPACE || '.', policyPath);
+  if (!existsSync(override)) return DEFAULT_POLICY;
+  const parsed = parsePolicyJson(readFileSync(override, 'utf8'), override);
+  if (!parsed) return DEFAULT_POLICY;
+  note(`Tier policy loaded from workspace ${policyPath} (${parsed.policy_id || 'unnamed'}).`);
+  return parsed;
+}
+
+async function fetchPolicyFromGitHub(ref, policyPath) {
+  const token = process.env.INPUT_GITHUB_TOKEN || process.env.GITHUB_TOKEN;
+  if (!token || !repoFull) {
+    warn('No token available — cannot load policy from Git ref.');
+    return null;
+  }
+  const encodedPath = policyPath.split('/').map(encodeURIComponent).join('/');
+  const res = await fetch(
+    `https://api.github.com/repos/${repoFull}/contents/${encodedPath}?ref=${encodeURIComponent(ref)}`,
+    { headers: { authorization: `Bearer ${token}`, accept: 'application/vnd.github+json' } }
+  );
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    warn(`GitHub API ${res.status} while loading policy at ref ${ref} — skipping remote policy.`);
+    return null;
+  }
+  const data = await res.json();
+  if (!data.content) return null;
+  const raw = Buffer.from(data.content, 'base64').toString('utf8');
+  return parsePolicyJson(raw, `${ref}:${policyPath}`);
+}
+
+async function loadPolicy() {
+  const policyPath = process.env.INPUT_POLICY_PATH || DEFAULT_POLICY_PATH;
+  const resolved = resolvePolicyRef(process.env.INPUT_POLICY_REF, pr);
+
+  if (resolved === 'workspace') {
+    return loadPolicyFromWorkspace(policyPath);
+  }
+
+  const gitRef = resolved.startsWith('git:') ? resolved.slice(4) : resolved;
+  const fromApi = await fetchPolicyFromGitHub(gitRef, policyPath);
+  if (fromApi) {
+    note(`Tier policy loaded from ref ${gitRef} at ${policyPath} (${fromApi.policy_id || 'unnamed'}).`);
+    return fromApi;
+  }
+  note(`No policy at ${policyPath} on ref ${gitRef}; using built-in deny-by-default registry.`);
   return DEFAULT_POLICY;
 }
 
@@ -385,7 +445,7 @@ function inEnvelope(scope, path) {
   return prefixes.some((p) => path.startsWith(p) || (p.includes('.') && path === p));
 }
 
-const policy = loadPolicy();
+const policy = await loadPolicy();
 const changed = await fetchChangedFiles();
 
 // Rule 5.2: unknown ≠ harmless. If changed files could not be analyzed, the

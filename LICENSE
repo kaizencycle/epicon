@@ -1,37 +1,23 @@
-GNU AFFERO GENERAL PUBLIC LICENSE
-Version 3, 19 November 2007
+CC0 1.0 Universal
 
-Copyright (C) 2025 Mobius Systems
+Statement of Purpose
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+The laws of most jurisdictions throughout the world automatically confer
+exclusive Copyright and Related Rights upon the creator and subsequent
+owner(s) of an original work of authorship and/or a database.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
+Certain owners wish to permanently relinquish those rights to a Work for
+the purpose of contributing to a commons of creative, cultural and
+scientific works that the public can reliably and without fear of later
+claims of infringement build upon, modify, incorporate in other works,
+reuse and redistribute as freely as possible in any form whatsoever and
+for any purposes, including without limitation commercial purposes.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
+For these and/or other purposes, the person associating CC0 with a Work
+(the "Affirmer"), to the extent that he or she is an owner of Copyright
+and Related Rights in the Work, voluntarily elects to apply CC0 to the
+Work and publicly distribute the Work under its terms.
 
-================================================================================
+Affirmer: kaizencycle (Mobius Substrate)
 
-ETHICAL ADDENDUM
-
-This software may not be used to:
-- Violate human rights
-- Support surveillance states or authoritarian regimes
-- Enable discrimination based on protected characteristics
-- Facilitate harm to individuals or communities
-- Undermine democratic processes
-
-For enterprise exceptions or clarifications, contact: hello@epicon.dev
-
-================================================================================
-
-Additional License Information:
-- Full AGPL-3.0 text: https://www.gnu.org/licenses/agpl-3.0.en.html
-- Commercial licensing available for organizations that cannot comply with AGPL
-- Contact: hello@epicon.dev for commercial inquiries
+Full legal code: https://creativecommons.org/publicdomain/zero/1.0/legalcode

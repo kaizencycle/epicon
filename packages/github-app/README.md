@@ -71,4 +71,4 @@ on the GitHub App, and point the App's webhook URL at
 
 ## License
 
-AGPL-3.0 - Part of Mobius Systems
+CC0-1.0 - Part of Mobius Systems

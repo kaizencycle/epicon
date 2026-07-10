@@ -4,4 +4,4 @@
 
 ## License
 
-CC0-1.0 — Mobius Systems
+CC0-1.0 - Part of Mobius Substrate

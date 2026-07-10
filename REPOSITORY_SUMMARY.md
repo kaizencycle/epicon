@@ -13,7 +13,7 @@ The EPICON Guard repository has been fully set up and is ready for development!
 ✅ package.json           - Monorepo configuration with Turborepo
 ✅ turbo.json            - Build pipeline configuration  
 ✅ .gitignore            - Git ignore rules
-✅ LICENSE               - AGPL-3.0 with ethical addendum
+✅ LICENSE               - CC0 1.0 Universal (public domain)
 ```
 
 ### Documentation
@@ -397,7 +397,7 @@ You've successfully set up the EPICON Guard repository!
 3. ✅ Set up CI/CD with EPICON dogfooding
 4. ✅ Built production-ready landing page
 5. ✅ Provided real-world examples
-6. ✅ Made it all open source (AGPL-3.0)
+6. ✅ Made it all open source (CC0-1.0 public domain)
 
 **What's next:**
 1. Review the files

@@ -1,7 +1,7 @@
 # epicon-api (Render)
 
 **Service:** `epicon-api` on Render · **Public URL:** https://epicon-api.onrender.com  
-**Source:** [kaizencycle/epicon](https://github.com/kaizencycle/epicon) · **Root:** `packages/github-app`
+**Source:** [kaizencycle/epicon](https://github.com/kaizencycle/epicon) · **Entry:** `packages/github-app/src/server.mjs`
 
 ## Role
 
@@ -22,18 +22,26 @@ enforcement (C-368 PR5) converges on this service — do not create a separate
 ## Deploy
 
 Configured in [`render.yaml`](../../render.yaml) as `epicon-github-webhook` (service
-name on Render dashboard may appear as `epicon-api`). Build/start from
-`packages/github-app`:
+name on Render dashboard may appear as `epicon-api`). Build from repo root (npm workspaces);
+start `packages/github-app/src/server.mjs`:
 
 ```bash
-cd packages/github-app
 npm install
-node src/server.mjs
+node packages/github-app/src/server.mjs
 ```
 
-**Required env:** `GITHUB_WEBHOOK_SECRET` (must match the GitHub App webhook secret).
+**Required env:**
 
-**Health check:** `/health` (Render `healthCheckPath`).
+| Variable | Purpose |
+|----------|---------|
+| `GITHUB_WEBHOOK_SECRET` | Must match the GitHub App webhook secret |
+| `APP_ID` | GitHub App ID — enables Probot I2 enforcement with `PRIVATE_KEY` |
+| `PRIVATE_KEY` | GitHub App private key (PEM) |
+| `WEBHOOK_PATH` | Default `/api/github/webhook` |
+
+Without `APP_ID` + `PRIVATE_KEY`, the service runs **transport-only** (signature verify + log; no Check Runs).
+
+**Health check:** `/health` (Render `healthCheckPath`). Response includes `enforcement_mode`: `probot-i2` or `transport-only`.
 
 ## Verification
 

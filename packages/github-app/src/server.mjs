@@ -87,23 +87,75 @@ export function createServer({ secret = process.env.GITHUB_WEBHOOK_SECRET, logge
 if (import.meta.url === `file://${process.argv[1]}`) {
   const port = Number(process.env.PORT) || 3000;
   const secret = process.env.GITHUB_WEBHOOK_SECRET;
+  const probotConfigured = Boolean(process.env.APP_ID?.trim() && process.env.PRIVATE_KEY?.trim());
 
-  if (!secret) {
+  if (probotConfigured) {
+    const { guardAppFn } = await import('../../../apps/guard-app/src/index.js');
+    const { Server, Probot } = await import('probot');
+
+    const server = new Server({
+      port,
+      host: '0.0.0.0',
+      webhookPath: WEBHOOK_PATH,
+      Probot: Probot.defaults({
+        appId: Number(process.env.APP_ID),
+        privateKey: process.env.PRIVATE_KEY,
+        secret: process.env.GITHUB_WEBHOOK_SECRET,
+      }),
+    });
+
+    server.expressApp.get('/health', (_req, res) => {
+      res.status(200).json(healthPayload());
+    });
+    server.expressApp.get('/healthz', (_req, res) => {
+      res.status(200).json(healthPayload());
+    });
+    server.expressApp.get('/', (_req, res) => {
+      res.status(200).json({
+        ...rootManifest(),
+        enforcement_mode: 'probot-i2',
+      });
+    });
+
+    try {
+      await server.load(guardAppFn);
+      await server.start();
+      console.log(
+        `[epicon-api] Probot I2 enforcement listening on 0.0.0.0:${port}${WEBHOOK_PATH}`,
+      );
+    } catch (err) {
+      console.error('[epicon-api] Probot failed to start:', err.message);
+      process.exit(1);
+    }
+
+    const shutdown = async (signal) => {
+      console.log(`[epicon-api] received ${signal}, shutting down.`);
+      await server.stop();
+      process.exit(0);
+    };
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
+    process.on('SIGINT', () => shutdown('SIGINT'));
+  } else {
+    if (!secret) {
+      console.warn(
+        '[epicon-webhook] WARNING: GITHUB_WEBHOOK_SECRET is not set. ' +
+          'Signed deliveries will be rejected with 500 until it is configured.',
+      );
+    }
     console.warn(
-      '[epicon-webhook] WARNING: GITHUB_WEBHOOK_SECRET is not set. ' +
-        'Signed deliveries will be rejected with 500 until it is configured.'
+      '[epicon-webhook] APP_ID/PRIVATE_KEY not set — transport-only mode (no I2 check runs).',
     );
+
+    const server = createServer({ secret });
+    server.listen(port, '0.0.0.0', () => {
+      console.log(`[epicon-webhook] transport-only on 0.0.0.0:${port}${WEBHOOK_PATH}`);
+    });
+
+    const shutdown = (signal) => {
+      console.log(`[epicon-webhook] received ${signal}, shutting down.`);
+      server.close(() => process.exit(0));
+    };
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
+    process.on('SIGINT', () => shutdown('SIGINT'));
   }
-
-  const server = createServer({ secret });
-  server.listen(port, '0.0.0.0', () => {
-    console.log(`[epicon-webhook] listening on 0.0.0.0:${port}${WEBHOOK_PATH}`);
-  });
-
-  const shutdown = (signal) => {
-    console.log(`[epicon-webhook] received ${signal}, shutting down.`);
-    server.close(() => process.exit(0));
-  };
-  process.on('SIGTERM', () => shutdown('SIGTERM'));
-  process.on('SIGINT', () => shutdown('SIGINT'));
 }

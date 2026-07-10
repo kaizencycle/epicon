@@ -119,18 +119,12 @@ async function runGate(context, { revalidate = false } = {}) {
   }
 }
 
-export function createGuardApp() {
-  const probot = new Probot({
-    appId: process.env.APP_ID,
-    privateKey: process.env.PRIVATE_KEY,
-    secret: process.env.GITHUB_WEBHOOK_SECRET,
-  });
-
+export function registerGuardHandlers(probot) {
   probot.on(
     ['pull_request.opened', 'pull_request.edited', 'pull_request.synchronize'],
     async (context) => {
       await runGate(context);
-    }
+    },
   );
 
   probot.on('issue_comment.created', async (context) => {
@@ -151,9 +145,28 @@ export function createGuardApp() {
         octokit: context.octokit,
         payload: { pull_request: pr, repository: context.payload.repository },
       },
-      { revalidate: true }
+      { revalidate: true },
     );
   });
+}
+
+/** Probot application function for Server.load() (Probot 13+). */
+export async function guardAppFn(probot) {
+  registerGuardHandlers(probot);
+}
+
+export function createGuardApp(options = {}) {
+  const webhookPath =
+    options.webhookPath ?? process.env.WEBHOOK_PATH ?? '/api/github/webhook';
+
+  const probot = new Probot({
+    appId: process.env.APP_ID,
+    privateKey: process.env.PRIVATE_KEY,
+    secret: process.env.GITHUB_WEBHOOK_SECRET,
+    webhookPath,
+  });
+
+  registerGuardHandlers(probot);
 
   return probot;
 }
@@ -161,14 +174,22 @@ export function createGuardApp() {
 // Standalone start for local / Render when running guard-app directly.
 const entryPath = process.argv[1] ? fileURLToPath(import.meta.url) : '';
 if (entryPath && process.argv[1] === entryPath) {
+  const { Server, Probot } = await import('probot');
   const port = Number(process.env.PORT) || 3000;
-  const probot = createGuardApp();
-  probot.server
-    .listen(port, '0.0.0.0', () => {
-      console.log(`[epicon-guard-app] Probot listening on 0.0.0.0:${port}`);
-    })
-    .on('error', (err) => {
-      console.error('[epicon-guard-app] failed to start:', err.message);
-      process.exit(1);
-    });
+  const webhookPath = process.env.WEBHOOK_PATH ?? '/api/github/webhook';
+
+  const server = new Server({
+    port,
+    host: '0.0.0.0',
+    webhookPath,
+    Probot: Probot.defaults({
+      appId: Number(process.env.APP_ID),
+      privateKey: process.env.PRIVATE_KEY,
+      secret: process.env.GITHUB_WEBHOOK_SECRET,
+    }),
+  });
+
+  await server.load(guardAppFn);
+  await server.start();
+  console.log(`[epicon-guard-app] Probot listening on 0.0.0.0:${port}${webhookPath}`);
 }

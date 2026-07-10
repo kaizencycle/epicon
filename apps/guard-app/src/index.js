@@ -5,6 +5,8 @@
  * Falls back to transport-only mode when credentials are absent.
  */
 
+import { fileURLToPath } from 'node:url';
+
 import { Probot } from 'probot';
 
 import { DEFAULT_POLICY, formatSummary, validatePullRequest } from '@epicon-guard/guard-core';
@@ -40,7 +42,12 @@ async function runGate(context, { revalidate = false } = {}) {
   const repo = payload.repository.name;
   const headSha = pr.head.sha;
 
-  const priorState = await findPriorCheck(octokit, { owner, repo, headSha });
+  const priorState = await findPriorCheck(octokit, {
+    owner,
+    repo,
+    headSha,
+    pullNumber: pr.number,
+  });
   const i2 = evaluateI2({ priorState, prBody: pr.body });
 
   if (i2.blocked) {
@@ -152,7 +159,8 @@ export function createGuardApp() {
 }
 
 // Standalone start for local / Render when running guard-app directly.
-if (import.meta.url === `file://${process.argv[1]}`) {
+const entryPath = process.argv[1] ? fileURLToPath(import.meta.url) : '';
+if (entryPath && process.argv[1] === entryPath) {
   const port = Number(process.env.PORT) || 3000;
   const probot = createGuardApp();
   probot.server

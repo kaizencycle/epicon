@@ -12,17 +12,36 @@ import {
 
 export const CHECK_NAME = 'Intent Publication Gate';
 
-/** Find the most recent completed check run for this gate. */
-export async function findPriorCheck(octokit, { owner, repo, headSha }) {
-  const { data } = await octokit.checks.listForRef({
-    owner,
-    repo,
-    ref: headSha,
-    check_name: CHECK_NAME,
-    per_page: 5,
-  });
-  const prior = data.check_runs?.find((r) => r.output?.summary);
-  return prior ? parseCheckState(prior.output.summary) : null;
+/** Find the most recent completed check run for this gate (searches PR commit history). */
+export async function findPriorCheck(octokit, { owner, repo, headSha, pullNumber }) {
+  const shas = [headSha];
+
+  if (pullNumber) {
+    const { data: commits } = await octokit.pulls.listCommits({
+      owner,
+      repo,
+      pull_number: pullNumber,
+      per_page: 100,
+    });
+    for (let i = commits.length - 2; i >= 0; i--) {
+      shas.push(commits[i].sha);
+    }
+  }
+
+  for (const sha of shas) {
+    const { data } = await octokit.checks.listForRef({
+      owner,
+      repo,
+      ref: sha,
+      check_name: CHECK_NAME,
+      per_page: 5,
+    });
+    const prior = data.check_runs?.find(
+      (r) => r.output?.summary && r.status === 'completed'
+    );
+    if (prior) return parseCheckState(prior.output.summary);
+  }
+  return null;
 }
 
 /**

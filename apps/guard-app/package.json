@@ -11,7 +11,8 @@
   },
   "scripts": {
     "start": "node src/index.js",
-    "dev": "node --watch src/index.js"
+    "dev": "node --watch src/index.js",
+    "test": "node --test test/*.test.mjs"
   },
   "dependencies": {
     "@epicon-guard/guard-core": "*",

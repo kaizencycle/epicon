@@ -90,37 +90,48 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const probotConfigured = Boolean(process.env.APP_ID?.trim() && process.env.PRIVATE_KEY?.trim());
 
   if (probotConfigured) {
-    const { createGuardApp } = await import('../../../apps/guard-app/src/index.js');
-    const probot = createGuardApp({ webhookPath: WEBHOOK_PATH });
-    const app = probot.server;
+    const { guardAppFn } = await import('../../../apps/guard-app/src/index.js');
+    const { Server, Probot } = await import('probot');
 
-    app.get('/health', (_req, res) => {
+    const server = new Server({
+      port,
+      host: '0.0.0.0',
+      webhookPath: WEBHOOK_PATH,
+      Probot: Probot.defaults({
+        appId: Number(process.env.APP_ID),
+        privateKey: process.env.PRIVATE_KEY,
+        secret: process.env.GITHUB_WEBHOOK_SECRET,
+      }),
+    });
+
+    server.expressApp.get('/health', (_req, res) => {
       res.status(200).json(healthPayload());
     });
-    app.get('/healthz', (_req, res) => {
+    server.expressApp.get('/healthz', (_req, res) => {
       res.status(200).json(healthPayload());
     });
-    app.get('/', (_req, res) => {
+    server.expressApp.get('/', (_req, res) => {
       res.status(200).json({
         ...rootManifest(),
         enforcement_mode: 'probot-i2',
       });
     });
 
-    app
-      .listen(port, '0.0.0.0', () => {
-        console.log(
-          `[epicon-api] Probot I2 enforcement listening on 0.0.0.0:${port}${WEBHOOK_PATH}`,
-        );
-      })
-      .on('error', (err) => {
-        console.error('[epicon-api] Probot failed to start:', err.message);
-        process.exit(1);
-      });
+    try {
+      await server.load(guardAppFn);
+      await server.start();
+      console.log(
+        `[epicon-api] Probot I2 enforcement listening on 0.0.0.0:${port}${WEBHOOK_PATH}`,
+      );
+    } catch (err) {
+      console.error('[epicon-api] Probot failed to start:', err.message);
+      process.exit(1);
+    }
 
-    const shutdown = (signal) => {
+    const shutdown = async (signal) => {
       console.log(`[epicon-api] received ${signal}, shutting down.`);
-      app.close(() => process.exit(0));
+      await server.stop();
+      process.exit(0);
     };
     process.on('SIGTERM', () => shutdown('SIGTERM'));
     process.on('SIGINT', () => shutdown('SIGINT'));

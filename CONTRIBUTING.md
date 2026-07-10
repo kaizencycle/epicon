@@ -162,7 +162,7 @@ Significant contributions may result in:
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the AGPL-3.0 license.
+By contributing, you agree that your contributions will be licensed under CC0 1.0 Universal (public domain).
 
 ## Need Help?
 

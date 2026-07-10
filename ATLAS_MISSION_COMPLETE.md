@@ -20,7 +20,7 @@ Successfully set up the complete EPICON Guard repository infrastructure with all
 - ✅ `package.json` - Monorepo configuration with Turborepo
 - ✅ `turbo.json` - Build pipeline configuration
 - ✅ `.gitignore` - Git ignore rules
-- ✅ `LICENSE` - AGPL-3.0 with ethical addendum
+- ✅ `LICENSE` - CC0 1.0 Universal (public domain)
 - ✅ GitHub Actions CI/CD with EPICON dogfooding
 
 ### Documentation (7/7)
@@ -249,7 +249,7 @@ Designed for AI era:
 | CI/CD | ✅ COMPLETE | GitHub Actions with dogfooding |
 | Landing page | ✅ COMPLETE | Deploy-ready HTML |
 | Scripts | ✅ COMPLETE | Init automation |
-| License | ✅ COMPLETE | AGPL-3.0 with ethics |
+| License | ✅ COMPLETE | CC0-1.0 public domain |
 
 **OVERALL: 8/8 OBJECTIVES COMPLETE** ✅
 

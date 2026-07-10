@@ -1,5 +1,5 @@
 {
-  "name": "@epicon-guard/epicon",
+  "name": "@kaizencycle/epicon",
   "version": "0.9.0",
   "description": "Git commits tell you WHAT changed. EPICON tells you WHY.",
   "private": true,
@@ -23,7 +23,7 @@
     "url": "https://github.com/kaizencycle/epicon/issues"
   },
   "author": "Mobius Systems <hello@mobius.systems>",
-  "license": "AGPL-3.0",
+  "license": "CC0-1.0",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"

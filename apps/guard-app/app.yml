@@ -1,0 +1,21 @@
+# EPICON Guard App — GitHub App manifest (Phase 1)
+# Register at github.com/settings/apps → EPICON Guard
+# Webhook URL: https://epicon-api.onrender.com/api/github/webhook
+
+name: EPICON Guard
+description: >-
+  Enforces EPICON-02 intent immutability (I2) and publishes Intent Publication Gate checks.
+url: https://epicon.dev
+
+public: false
+
+default_permissions:
+  checks: write
+  contents: read
+  issues: write
+  metadata: read
+  pull_requests: read
+
+default_events:
+  - pull_request
+  - issue_comment

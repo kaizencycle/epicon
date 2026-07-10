@@ -1,0 +1,20 @@
+{
+  "name": "@epicon-guard/guard-app",
+  "version": "0.1.0",
+  "description": "EPICON Guard GitHub App — Phase 1 I2 enforcement via Probot",
+  "private": true,
+  "type": "module",
+  "license": "CC0-1.0",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "@epicon-guard/guard-core": "*",
+    "probot": "^13.4.1"
+  }
+}

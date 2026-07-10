@@ -12,7 +12,7 @@ The EPICON Guard repository is now fully initialized with:
 ### Documentation
 - ✅ `README.md` - Main repository README
 - ✅ `CONTRIBUTING.md` - Contribution guidelines (with EPICON dogfooding!)
-- ✅ `LICENSE` - AGPL-3.0 with ethical addendum
+- ✅ `LICENSE` - CC0 1.0 Universal (public domain)
 - ✅ `docs/PRODUCT_SPEC.md` - Complete product specification
 
 ### GitHub Actions

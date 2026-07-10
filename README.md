@@ -2,7 +2,7 @@
 
 **Git commits tell you WHAT changed. EPICON tells you WHY.**
 
-[![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue)](./LICENSE)
+[![License: CC0-1.0](https://img.shields.io/badge/license-CC0--1.0-lightgrey)](./LICENSE)
 [![Part of: Mobius Substrate](https://img.shields.io/badge/Mobius-Substrate-6E00FF)](https://mobius-substrate.com)
 [![GitHub Action: v1](https://img.shields.io/badge/GitHub%20Action-v1-2ea44f)](https://github.com/kaizencycle/epicon)
 
@@ -186,9 +186,11 @@ AUREA and roster).
 
 ## License
 
-[AGPL-3.0](./LICENSE). The EPICON specifications in Mobius-Substrate are
-CC0 1.0 (public domain) — the protocol is free for anyone to implement;
-this implementation is copyleft.
+CC0 1.0 Universal (public domain). Spec and implementation. Do anything;
+attribution appreciated, never required.
+
+The hosted attestation layer (Guard App, dashboard) is not covered by this
+repository license — only the grammar and validator source here.
 
 ---
 

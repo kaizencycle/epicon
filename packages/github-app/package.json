@@ -4,7 +4,7 @@
   "description": "EPICON Guard GitHub App webhook endpoint (zero-dependency Node service).",
   "private": true,
   "type": "module",
-  "license": "AGPL-3.0",
+  "license": "CC0-1.0",
   "main": "src/handler.mjs",
   "exports": {
     ".": "./src/handler.mjs",

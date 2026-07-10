@@ -18,13 +18,14 @@ jobs:
         uses: actions/checkout@v4
 
       # In the epicon repo itself we reference the local action.
-      # Federation repos use: kaizencycle/epicon@v1
+      # Federation repos use: kaizencycle/epicon@v1.1
       - name: EPICON Guard
         id: guard
         uses: ./
         with:
           github-token: ${{ github.token }}
           mode: enforce
+          policy-ref: base
 
       - name: Verdict
         run: |

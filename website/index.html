@@ -1,508 +1,502 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EPICON Guard — Git commits tell you WHAT changed. EPICON tells you WHY.</title>
-    <meta name="description" content="The world's first Intent Accountability Layer for Git. Transform version control from 'what changed' to 'why it changed.'">
-    
-    <!-- Open Graph / Social Media -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="EPICON Guard — Intent Accountability for Git">
-    <meta property="og:description" content="Git commits tell you WHAT changed. EPICON tells you WHY.">
-    <meta property="og:image" content="https://epicondev.com/assets/og-image.svg">
-    <meta property="og:url" content="https://epicondev.com/">
-    
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="EPICON Guard">
-    <meta name="twitter:description" content="The Intent Layer for Git">
-    <meta name="twitter:image" content="https://epicondev.com/assets/og-image.svg">
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        :root {
-            --primary: #6E00FF;
-            --primary-dark: #5500CC;
-            --secondary: #00D9FF;
-            --accent: #FF00AA;
-            --dark: #0A0A0A;
-            --dark-2: #1A1A1A;
-            --dark-3: #2A2A2A;
-            --light: #F5F5F5;
-            --success: #00FF88;
-            --warning: #FFB800;
-            --danger: #FF3366;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-            background: var(--dark);
-            color: var(--light);
-            line-height: 1.6;
-        }
-        
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2rem;
-            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-2) 100%);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 50%, var(--primary) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, var(--secondary) 0%, transparent 50%);
-            opacity: 0.1;
-            animation: pulse 8s ease-in-out infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 0.1; }
-            50% { opacity: 0.2; }
-        }
-        
-        .hero-content {
-            position: relative;
-            z-index: 1;
-            max-width: 1200px;
-        }
-        
-        .logo {
-            font-size: 3rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1rem;
-            letter-spacing: -0.02em;
-        }
-        
-        .tagline {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            line-height: 1.3;
-        }
-        
-        .tagline .highlight {
-            color: var(--primary);
-        }
-        
-        .subtitle {
-            font-size: 1.25rem;
-            color: #AAA;
-            margin-bottom: 3rem;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        .cta-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 3rem;
-        }
-        
-        .btn {
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            display: inline-block;
-        }
-        
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(110, 0, 255, 0.3);
-        }
-        
-        .btn-secondary {
-            background: var(--dark-3);
-            color: white;
-            border: 2px solid var(--primary);
-        }
-        
-        .btn-secondary:hover {
-            background: var(--primary);
-            transform: translateY(-2px);
-        }
-        
-        /* Features Section */
-        .features {
-            padding: 6rem 2rem;
-            background: var(--dark);
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .section-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-        
-        .section-subtitle {
-            font-size: 1.25rem;
-            color: #AAA;
-            text-align: center;
-            margin-bottom: 4rem;
-        }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-        
-        .feature-card {
-            padding: 2rem;
-            border-radius: 12px;
-            background: var(--dark-2);
-            border: 1px solid var(--dark-3);
-            transition: all 0.3s;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-            box-shadow: 0 10px 30px rgba(110, 0, 255, 0.2);
-        }
-        
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .feature-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-        
-        /* Code Example */
-        .code-section {
-            padding: 6rem 2rem;
-            background: var(--dark-2);
-        }
-        
-        .code-example {
-            background: var(--dark);
-            border-radius: 12px;
-            padding: 2rem;
-            margin-top: 2rem;
-            border: 1px solid var(--dark-3);
-            overflow-x: auto;
-        }
-        
-        .code-example pre {
-            color: var(--light);
-            font-family: 'Monaco', 'Courier New', monospace;
-            font-size: 0.9rem;
-            line-height: 1.6;
-        }
-        
-        /* CTA Section */
-        .cta-section {
-            padding: 6rem 2rem;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            text-align: center;
-        }
-        
-        .cta-section h2 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .cta-section p {
-            font-size: 1.25rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
-        
-        .waitlist-form {
-            max-width: 500px;
-            margin: 0 auto;
-            display: flex;
-            gap: 1rem;
-        }
-        
-        .waitlist-form input {
-            flex: 1;
-            padding: 1rem;
-            border-radius: 8px;
-            border: none;
-            font-size: 1rem;
-            background: white;
-            color: var(--dark);
-        }
-        
-        .waitlist-form button {
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            border: none;
-            background: var(--dark);
-            color: white;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .waitlist-form button:hover {
-            background: var(--dark-2);
-            transform: translateY(-2px);
-        }
-        
-        /* Footer */
-        footer {
-            padding: 3rem 2rem;
-            background: var(--dark);
-            text-align: center;
-            border-top: 1px solid var(--dark-3);
-        }
-        
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-        
-        .footer-links a {
-            color: var(--light);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .footer-links a:hover {
-            color: var(--primary);
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .logo {
-                font-size: 2rem;
-            }
-            
-            .tagline {
-                font-size: 1.5rem;
-            }
-            
-            .subtitle {
-                font-size: 1rem;
-            }
-            
-            .cta-buttons {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-            }
-            
-            .waitlist-form {
-                flex-direction: column;
-            }
-            
-            .section-title {
-                font-size: 2rem;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EPICON Guard — No consequential action without recorded intent</title>
+<meta name="description" content="EPICON Guard is a GitHub Action that validates a structured Intent Publication in every pull request and classifies it into a consequence tier before merge. Git tells you what changed. EPICON tells you why.">
+
+<link rel="canonical" href="https://epicon.mobius-substrate.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="EPICON Guard">
+<meta property="og:title" content="EPICON Guard — Intent accountability for git">
+<meta property="og:description" content="Git commits tell you WHAT changed. EPICON tells you WHY. A GitHub Action enforcing the Mobius Substrate intent protocol at the PR boundary.">
+<meta property="og:url" content="https://epicon.mobius-substrate.com/">
+<meta property="og:image" content="https://epicon.mobius-substrate.com/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="EPICON Guard — Intent accountability for git">
+<meta name="twitter:description" content="No consequential action without recorded intent. Install the gate in five lines.">
+<meta name="twitter:image" content="https://epicon.mobius-substrate.com/assets/og-image.png">
+<meta name="theme-color" content="#0E1A33">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "EPICON Guard",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any (GitHub Actions)",
+  "url": "https://epicon.mobius-substrate.com/",
+  "codeRepository": "https://github.com/kaizencycle/epicon",
+  "description": "A GitHub Action that validates EPICON-02 Intent Publications in pull requests and classifies PRs into EP-1/EP-2/EP-3 consequence tiers per the Mobius Substrate EPICON Tiering Specification.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "creator": { "@type": "Organization", "name": "Mobius Substrate", "url": "https://mobius-substrate.com" }
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   EPICON Guard — landing
+   Direction: blue-backed constitutional document / flight recorder.
+   Ground: legal blue-back ink. Type: IBM Plex system (Serif display,
+   Sans body, Mono for records). Accents = the failure matrix itself:
+   PASS green, BACKFILL amber, QUARANTINE orange, FAIL_CLOSED red.
+   Signature: the hero is an Intent Publication with a verdict stamp.
+   ============================================================ */
+:root{
+  --ink:        #0E1A33;   /* legal blue-back */
+  --ink-deep:   #0A1226;
+  --ink-line:   #24345C;   /* hairline rules on ink */
+  --paper:      #E9EDF5;   /* cool document paper */
+  --paper-dim:  #A9B4CC;
+  --paper-faint:#6E7C9E;
+  --pass:       #3FB950;
+  --backfill:   #E7B10A;
+  --quarantine: #E8590C;
+  --failclosed: #E5484D;
+  --violet:     #9D7BFF;   /* Mobius brand, lifted for dark ground */
+  --max: 1120px;
+  --serif: "IBM Plex Serif", Georgia, serif;
+  --sans:  "IBM Plex Sans", -apple-system, sans-serif;
+  --mono:  "IBM Plex Mono", ui-monospace, monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);
+  color:var(--paper);
+  font-family:var(--sans);
+  font-size:16.5px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--violet);color:var(--ink-deep)}
+a{color:inherit}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+
+/* ---- document header ribbon ---- */
+.doc-ribbon{
+  border-bottom:1px solid var(--ink-line);
+  font-family:var(--mono);font-size:12px;letter-spacing:.04em;
+  color:var(--paper-dim);
+}
+.doc-ribbon .wrap{
+  display:flex;flex-wrap:wrap;gap:8px 28px;align-items:center;
+  padding-top:14px;padding-bottom:14px;
+}
+.doc-ribbon .id{color:var(--paper);font-weight:600}
+.doc-ribbon a{color:var(--paper-dim);text-decoration:none;border-bottom:1px dotted var(--ink-line)}
+.doc-ribbon a:hover,.doc-ribbon a:focus-visible{color:var(--paper)}
+.doc-ribbon .spacer{flex:1}
+.chip{
+  display:inline-block;padding:2px 9px;border:1px solid var(--ink-line);
+  border-radius:3px;font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;
+}
+.chip.pass{color:var(--pass);border-color:color-mix(in srgb,var(--pass) 45%,transparent)}
+
+/* ---- hero ---- */
+.hero{padding:88px 0 72px;border-bottom:1px solid var(--ink-line)}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
+.eyebrow{
+  font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--violet);margin-bottom:22px;
+}
+h1{
+  font-family:var(--serif);font-weight:500;
+  font-size:clamp(34px,4.6vw,54px);line-height:1.12;letter-spacing:-.01em;
+}
+h1 .why{font-style:italic;font-weight:600;border-bottom:3px solid var(--pass)}
+.hero p.lede{
+  margin-top:24px;font-size:18px;color:var(--paper-dim);max-width:46ch;
+}
+.hero p.lede strong{color:var(--paper);font-weight:500}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:36px}
+.btn{
+  display:inline-block;padding:13px 24px;border-radius:4px;
+  font-family:var(--sans);font-weight:600;font-size:15px;
+  text-decoration:none;transition:transform .12s ease,background .12s ease;
+}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--pass);color:var(--ink-deep)}
+.btn.primary:hover{background:#4cc95e}
+.btn.ghost{border:1px solid var(--ink-line);color:var(--paper)}
+.btn.ghost:hover{border-color:var(--paper-faint)}
+.hero .protocol-note{
+  margin-top:30px;font-family:var(--mono);font-size:13px;color:var(--paper-faint);
+}
+
+/* ---- the intent record (signature) ---- */
+.record{
+  position:relative;background:var(--ink-deep);
+  border:1px solid var(--ink-line);border-radius:6px;
+  padding:26px 26px 30px;box-shadow:0 24px 60px rgba(0,0,0,.35);
+}
+.record .rec-head{
+  display:flex;justify-content:space-between;align-items:baseline;
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;
+  color:var(--paper-faint);text-transform:uppercase;
+  border-bottom:1px solid var(--ink-line);padding-bottom:12px;margin-bottom:16px;
+}
+.record pre{
+  font-family:var(--mono);font-size:12.8px;line-height:1.75;
+  color:var(--paper-dim);overflow-x:auto;
+}
+.record .k{color:var(--violet)}
+.record .v{color:var(--paper)}
+.record .c{color:var(--paper-faint);font-style:italic}
+.stamp{
+  position:absolute;right:18px;bottom:22px;
+  transform:rotate(-8deg);
+  border:2.5px solid var(--pass);color:var(--pass);
+  border-radius:5px;padding:7px 15px;text-align:center;
+  font-family:var(--mono);font-weight:600;font-size:13px;letter-spacing:.12em;
+  background:color-mix(in srgb,var(--pass) 7%,transparent);
+  animation:stamp .45s cubic-bezier(.2,1.6,.4,1) .6s backwards;
+}
+.stamp small{display:block;font-size:9.5px;font-weight:400;letter-spacing:.18em;margin-top:2px;opacity:.85}
+@keyframes stamp{
+  from{transform:rotate(-8deg) scale(2.4);opacity:0}
+  to{transform:rotate(-8deg) scale(1);opacity:1}
+}
+@media (prefers-reduced-motion:reduce){
+  .stamp{animation:none}
+  html{scroll-behavior:auto}
+}
+
+/* ---- shared section furniture ---- */
+section{padding:76px 0;border-bottom:1px solid var(--ink-line)}
+.sec-label{
+  font-family:var(--mono);font-size:12px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--paper-faint);margin-bottom:14px;
+}
+h2{
+  font-family:var(--serif);font-weight:500;font-size:clamp(26px,3vw,34px);
+  letter-spacing:-.005em;margin-bottom:14px;
+}
+.sec-intro{color:var(--paper-dim);max-width:62ch;margin-bottom:44px}
+.sec-intro a{color:var(--paper);text-decoration:underline;text-decoration-color:var(--ink-line);text-underline-offset:3px}
+.sec-intro a:hover{text-decoration-color:var(--paper)}
+
+/* ---- invariants ---- */
+.clauses{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--ink-line);border:1px solid var(--ink-line)}
+.clause{background:var(--ink);padding:26px 28px}
+.clause .num{
+  font-family:var(--mono);font-size:12px;color:var(--violet);letter-spacing:.1em;
+}
+.clause h3{
+  font-family:var(--serif);font-weight:600;font-size:18px;margin:8px 0 8px;
+}
+.clause p{font-size:14.5px;color:var(--paper-dim)}
+.clause code{font-family:var(--mono);font-size:12.5px;color:var(--paper)}
+
+/* ---- tiers / failure matrix ---- */
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.tier{
+  border:1px solid var(--ink-line);border-radius:6px;padding:26px;
+  border-top:4px solid var(--t);background:var(--ink-deep);
+}
+.tier.ep1{--t:var(--backfill)}
+.tier.ep2{--t:var(--quarantine)}
+.tier.ep3{--t:var(--failclosed)}
+.tier .tcode{font-family:var(--mono);font-weight:600;font-size:14px;letter-spacing:.08em;color:var(--t)}
+.tier h3{font-family:var(--serif);font-weight:600;font-size:19px;margin:8px 0 10px}
+.tier p{font-size:14.5px;color:var(--paper-dim)}
+.tier .verdict{
+  margin-top:18px;padding-top:14px;border-top:1px dashed var(--ink-line);
+  font-family:var(--mono);font-size:12.5px;color:var(--t);letter-spacing:.06em;
+}
+.rules-note{
+  margin-top:30px;font-size:14.5px;color:var(--paper-dim);max-width:70ch;
+}
+.rules-note code{font-family:var(--mono);font-size:12.5px;color:var(--paper)}
+
+/* ---- quick start ---- */
+.steps{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.step{border:1px solid var(--ink-line);border-radius:6px;background:var(--ink-deep);overflow:hidden}
+.step .step-head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 20px;border-bottom:1px solid var(--ink-line);
+  font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--paper-dim);
+  text-transform:uppercase;
+}
+.copy-btn{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;
+  background:none;border:1px solid var(--ink-line);border-radius:3px;
+  color:var(--paper-dim);padding:4px 12px;cursor:pointer;
+}
+.copy-btn:hover{color:var(--paper);border-color:var(--paper-faint)}
+.step pre{
+  padding:20px;font-family:var(--mono);font-size:12.6px;line-height:1.7;
+  color:var(--paper-dim);overflow-x:auto;
+}
+.step .k{color:var(--violet)}.step .v{color:var(--paper)}.step .s{color:var(--pass)}
+.step-then{
+  grid-column:1/-1;font-size:14.5px;color:var(--paper-dim);
+  border-left:3px solid var(--pass);padding:4px 0 4px 18px;
+}
+.step-then strong{color:var(--paper)}
+
+/* ---- canon + status ---- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:64px}
+.canon-list{list-style:none}
+.canon-list li{border-bottom:1px solid var(--ink-line);padding:14px 0}
+.canon-list a{
+  text-decoration:none;display:block;
+}
+.canon-list .cname{display:block;font-family:var(--mono);font-size:13.5px;color:var(--paper)}
+.canon-list a:hover .cname{color:var(--violet)}
+.canon-list .cdesc{display:block;font-size:13.5px;color:var(--paper-faint);margin-top:3px}
+.status-table{width:100%;border-collapse:collapse;font-size:14px}
+.status-table td{padding:12px 0;border-bottom:1px solid var(--ink-line);color:var(--paper-dim)}
+.status-table td:last-child{text-align:right;font-family:var(--mono);font-size:12px;letter-spacing:.05em;white-space:nowrap}
+.st-live{color:var(--pass)}
+.st-road{color:var(--backfill)}
+.st-concept{color:var(--paper-faint)}
+.status-note{margin-top:18px;font-family:var(--serif);font-style:italic;font-size:15px;color:var(--paper-dim)}
+
+/* ---- footer ---- */
+footer{padding:52px 0 64px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 32px;align-items:baseline;font-size:13.5px;color:var(--paper-faint)}
+footer a{color:var(--paper-dim);text-decoration:none;border-bottom:1px dotted var(--ink-line)}
+footer a:hover{color:var(--paper)}
+footer .motto{font-family:var(--serif);font-style:italic}
+footer .spacer{flex:1}
+
+/* ---- responsive ---- */
+@media (max-width:920px){
+  .hero .wrap,.steps,.split{grid-template-columns:1fr}
+  .clauses{grid-template-columns:1fr}
+  .tiers{grid-template-columns:1fr}
+  .hero{padding:56px 0}
+  section{padding:56px 0}
+}
+:focus-visible{outline:2px solid var(--violet);outline-offset:3px}
+</style>
 </head>
 <body>
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <div class="logo">🛡️ EPICON Guard</div>
-            <h1 class="tagline">
-                Git commits tell you <span class="highlight">WHAT</span> changed.<br>
-                EPICON tells you <span class="highlight">WHY</span>.
-            </h1>
-            <p class="subtitle">
-                The world's first Intent Accountability Layer for Git. Transform version control from "what changed" to "why it changed."
-            </p>
-            <div class="cta-buttons">
-                <a href="#waitlist" class="btn btn-primary">Join Waitlist</a>
-                <a href="https://github.com/kaizencycle/epicon" class="btn btn-secondary">View on GitHub</a>
-            </div>
-        </div>
-    </section>
 
-    <!-- Features Section -->
-    <section class="features">
-        <div class="container">
-            <h2 class="section-title">Why EPICON Guard?</h2>
-            <p class="section-subtitle">Intent accountability for every code change</p>
-            
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">📝</div>
-                    <h3>Intent Publication</h3>
-                    <p>Every PR requires a structured justification: WHY, WHAT, HOW, and WHEN. No more guessing why code exists.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">⏰</div>
-                    <h3>Time-Bounded Authority</h3>
-                    <p>All access grants expire automatically. No more zombie permissions or forgotten temporary fixes.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🎯</div>
-                    <h3>Scope Enforcement</h3>
-                    <p>Changes limited to declared scope. Security engineers can't accidentally touch payment code.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🔄</div>
-                    <h3>Counterfactual Conditions</h3>
-                    <p>Clear success criteria: "If X happens, then do Y." Removes ambiguity about when to revert.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <h3>Audit-Ready Reports</h3>
-                    <p>Instant compliance reports for SOC 2, HIPAA, FedRAMP. Auditors love us.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🤖</div>
-                    <h3>AI-Powered Suggestions</h3>
-                    <p>Intent AI suggests justifications based on your code changes. Copilot for intent.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+<div class="doc-ribbon">
+  <div class="wrap">
+    <span class="id">EPICON&nbsp;GUARD</span>
+    <span>Mobius&nbsp;Substrate&nbsp;·&nbsp;constitutional&nbsp;gate</span>
+    <span class="spacer"></span>
+    <span class="chip pass">ACTION&nbsp;v1&nbsp;·&nbsp;LIVE</span>
+    <a href="https://github.com/kaizencycle/epicon">github.com/kaizencycle/epicon</a>
+    <a href="https://mobius-substrate.com">mobius-substrate.com</a>
+  </div>
+</div>
 
-    <!-- Code Example -->
-    <section class="code-section" id="demo">
-        <div class="container">
-            <h2 class="section-title">How It Works</h2>
-            <p class="section-subtitle">Simple YAML block in your PR description</p>
-            
-            <div class="code-example">
-                <pre>EPICON INTENT PUBLICATION
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow">Intent accountability for git</p>
+      <h1>Commits tell you what changed.<br>EPICON tells you <span class="why">why</span>.</h1>
+      <p class="lede">
+        <strong>No consequential action without recorded intent.</strong>
+        EPICON Guard is a GitHub Action that validates a structured Intent
+        Publication in every pull request — who, why, within what scope,
+        until when, and what would make you revert — and classifies the PR
+        into a consequence tier before it can merge.
+      </p>
+      <div class="cta-row">
+        <a class="btn primary" href="#install">Install the gate</a>
+        <a class="btn ghost" href="https://github.com/kaizencycle/Mobius-Substrate/tree/main/docs/epicon">Read the canon</a>
+      </div>
+      <p class="protocol-note">The protocol does not prevent actions. It makes divergence legible, attributable, and time-bound.</p>
+    </div>
 
-ledger_id: acme:payments:stripe-integration
-scope: core
-mode: normal
-issued_at: 2025-12-22T16:00:00Z
-expires_at: 2026-01-22T16:00:00Z
+    <figure class="record" aria-label="Example Intent Publication with a passing verdict">
+      <div class="rec-head">
+        <span>Intent Publication</span>
+        <span>EPICON-02 · IPDP</span>
+      </div>
+      <pre><span class="k">epicon_id</span>: <span class="v">EPICON_C-367_CORE_payments_v1</span>
+<span class="k">ledger_id</span>: <span class="v">kaizencycle</span>
+<span class="k">scope</span>: <span class="v">core</span>
+<span class="k">issued_at</span>: <span class="v">2026-07-09T00:00:00Z</span>
+<span class="k">expires_at</span>: <span class="v">2026-08-09T00:00:00Z</span>  <span class="c"># authority ends</span>
+<span class="k">justification</span>:
+  <span class="k">REASONING</span>: <span class="v">lower fees, stronger fraud detection</span>
+  <span class="k">ANCHORS</span>: <span class="v">2 independent</span>
+  <span class="k">COUNTERFACTUAL</span>: <span class="v">fraud &gt; 0.5% voids this</span>
+<span class="k">counterfactuals</span>:
+  - <span class="v">if conversion drops in A/B, revert</span></pre>
+      <div class="stamp" role="img" aria-label="Verdict: pass, tier EP-2, intent witnessed">
+        ✓ PASS · EP-2
+        <small>INTENT&nbsp;WITNESSED</small>
+      </div>
+    </figure>
+  </div>
+</header>
 
-justification: |
-  Adding Stripe payment integration for credit card processing.
-  
-  CONTEXT:
-  - Current provider (Braintree) has 2.9% fees
-  - Stripe offers 2.4% fees + better fraud detection
-  - Projected savings: $50k/year
-  
-  DECISION:
-  - Chose Stripe over Square (better API, same pricing)
-  - Will A/B test for 30 days before full migration
-  
-  SECURITY:
-  - PCI compliance validated
-  - Security team reviewed (approved 2025-12-20)
+<section id="invariants">
+  <div class="wrap">
+    <p class="sec-label">EPICON-02 · §2</p>
+    <h2>Six invariants. Every check cites one.</h2>
+    <p class="sec-intro">
+      The Guard enforces the
+      <a href="https://github.com/kaizencycle/Mobius-Substrate/blob/main/docs/epicon/EPICON-02.md">Intent Publication &amp; Divergence Protocol</a>
+      directly — a failed check names the invariant it protects, so the gate
+      teaches the protocol instead of just rejecting the contributor.
+    </p>
+    <div class="clauses">
+      <div class="clause"><span class="num">I1</span><h3>Intent precedes authority</h3><p>A pull request without a published intent block cannot merge into consequential surfaces. Authority is requested in writing, before the fact.</p></div>
+      <div class="clause"><span class="num">I2</span><h3>Intent is immutable once published</h3><p>The Guard emits a SHA-256 <code>justification_hash</code> of the published block — a witness against quiet rewriting after the fact.</p></div>
+      <div class="clause"><span class="num">I3</span><h3>Authority is scoped and time-bounded</h3><p>Every intent declares a scope envelope and an <code>issued_at → expires_at</code> window. Unbounded authority is a malformed intent.</p></div>
+      <div class="clause"><span class="num">I4</span><h3>Divergence is observable, never blocked</h3><p>Changed files outside the declared envelope are flagged as divergent — a state condition, not an accusation. Visibility, not prevention.</p></div>
+      <div class="clause"><span class="num">I5</span><h3>Expiration is mandatory</h3><p>Past <code>expires_at</code>, authority terminates. No renewal without a new Intent Publication and a version bump. Zombie permissions fail the gate.</p></div>
+      <div class="clause"><span class="num">I6</span><h3>Narrative never substitutes verification</h3><p>Structured justification — values, reasoning, anchors, boundaries, counterfactual — is required. Prose alone never passes the gate.</p></div>
+    </div>
+  </div>
+</section>
 
-counterfactuals:
-  - If fraud rate increases >0.5%, revert
-  - If A/B test shows worse conversion, stay with Braintree
-  - If users report payment issues, disable new provider</pre>
-            </div>
-        </div>
-    </section>
+<section id="tiers">
+  <div class="wrap">
+    <p class="sec-label">EPICON Tiering Spec v0.1 · §4–§8</p>
+    <h2>Consequence is classified by policy, never self-assessed.</h2>
+    <p class="sec-intro">
+      The Guard computes the PR's tier from a declarative path registry — the
+      proposer's own risk assessment is advisory only. The more consequential
+      the action, the stronger the requirement, and the harder the failure.
+    </p>
+    <div class="tiers">
+      <div class="tier ep1">
+        <span class="tcode">EP-1</span>
+        <h3>Low-risk record</h3>
+        <p>Docs, comments, trivially reversible changes. Minimal intent; backfill permitted.</p>
+        <p class="verdict">fails open — pass, honestly marked</p>
+      </div>
+      <div class="tier ep2">
+        <span class="tcode">EP-2</span>
+        <h3>Meaningful state change</h3>
+        <p>Application code, configuration, staging deploys. Full intent, validated before merge, single attestor.</p>
+        <p class="verdict">quarantines — check fails, remediable</p>
+      </div>
+      <div class="tier ep3">
+        <span class="tcode">EP-3</span>
+        <h3>Consequential action</h3>
+        <p>Value, rights, safety, canon, workflows, ledger state. Full intent plus constitutional commitment.</p>
+        <p class="verdict">fails closed — no intent, no merge</p>
+      </div>
+    </div>
+    <p class="rules-note">
+      Paths matching no registry pattern classify <code>EP-3</code> — deny-by-default,
+      because unknown ≠ harmless. A PR's tier is the maximum across its changed
+      files. Override the registry per-repo with <code>.github/epicon-policy.json</code>.
+    </p>
+  </div>
+</section>
 
-    <!-- CTA Section -->
-    <section class="cta-section" id="waitlist">
-        <div class="container">
-            <h2>Ready to Transform Your Git Workflow?</h2>
-            <p>Join the waitlist for early access to EPICON Guard</p>
-            <form class="waitlist-form">
-                <input type="email" placeholder="Enter your email" required />
-                <button type="submit">Join Waitlist</button>
-            </form>
-            <p style="margin-top: 1rem; opacity: 0.7; font-size: 0.9rem;">
-                🎉 First 1,000 users get lifetime 50% discount
-            </p>
-        </div>
-    </section>
+<section id="install">
+  <div class="wrap">
+    <p class="sec-label">Quick start</p>
+    <h2>Five lines to install. One block to publish intent.</h2>
+    <p class="sec-intro">
+      Zero dependencies, one Node file, roughly two seconds of CI. The gate becomes
+      binding when you mark <strong>Intent Publication Gate</strong> as a required
+      status check in branch protection.
+    </p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-head"><span>1 · .github/workflows/epicon-guard.yml</span><button class="copy-btn" data-copy="workflow">copy</button></div>
+        <pre id="workflow"><span class="k">name</span>: <span class="v">EPICON Guard</span>
+<span class="k">on</span>:
+  <span class="k">pull_request</span>:
+    <span class="k">types</span>: [<span class="v">opened, edited, synchronize, reopened</span>]
+<span class="k">permissions</span>:
+  <span class="k">contents</span>: <span class="v">read</span>
+  <span class="k">pull-requests</span>: <span class="v">read</span>
+<span class="k">jobs</span>:
+  <span class="k">epicon</span>:
+    <span class="k">runs-on</span>: <span class="v">ubuntu-latest</span>
+    <span class="k">steps</span>:
+      - <span class="k">uses</span>: <span class="v">actions/checkout@v4</span>
+      - <span class="k">uses</span>: <span class="s">kaizencycle/epicon@v1</span></pre>
+      </div>
+      <div class="step">
+        <div class="step-head"><span>2 · in your PR body</span><button class="copy-btn" data-copy="intent">copy</button></div>
+        <pre id="intent">```intent
+<span class="k">epicon_id</span>: <span class="v">EPICON_C-000_CORE_my-change_v1</span>
+<span class="k">ledger_id</span>: <span class="v">your-github-username</span>
+<span class="k">scope</span>: <span class="v">core</span>
+<span class="k">mode</span>: <span class="v">normal</span>
+<span class="k">issued_at</span>: <span class="v">2026-07-09T00:00:00Z</span>
+<span class="k">expires_at</span>: <span class="v">2026-08-09T00:00:00Z</span>
+<span class="k">justification</span>:
+  <span class="k">VALUES INVOKED</span>: <span class="v">integrity, transparency</span>
+  <span class="k">REASONING</span>: <span class="v">why this change makes sense</span>
+  <span class="k">ANCHORS</span>:
+    - <span class="v">independent support one</span>
+    - <span class="v">independent support two</span>
+  <span class="k">BOUNDARIES</span>: <span class="v">where this does not apply</span>
+  <span class="k">COUNTERFACTUAL</span>: <span class="v">what would void this</span>
+<span class="k">counterfactuals</span>:
+  - <span class="v">if tests fail, do not merge</span>
+```</pre>
+      </div>
+      <p class="step-then">
+        The Guard reports <strong>PASS · PASS_WITH_BACKFILL · QUARANTINE · FAIL_CLOSED</strong>
+        with the tier, the divergent paths, and the justification hash — as annotations,
+        a run summary, and workflow outputs your downstream steps can consume.
+      </p>
+    </div>
+  </div>
+</section>
 
-    <!-- Footer -->
-    <footer>
-        <div class="footer-links">
-            <a href="https://github.com/kaizencycle/epicon/blob/main/docs/PRODUCT_SPEC.md">Documentation</a>
-            <a href="https://github.com/kaizencycle/epicon">GitHub</a>
-            <a href="https://mobius.systems">Mobius Systems</a>
-            <a href="mailto:hello@epicondev.com">Contact</a>
-        </div>
-        <p style="color: #666;">
-            © 2025 EPICON Guard. Built by <a href="https://mobius.systems" style="color: var(--primary);">Mobius Systems</a>.
-        </p>
-        <p style="color: #666; margin-top: 1rem; font-size: 0.9rem;">
-            🛡️ Git commits tell you WHAT changed. EPICON tells you WHY.
-        </p>
-    </footer>
+<section id="canon">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <p class="sec-label">Source of truth</p>
+        <h2>The Action implements. Canon defines.</h2>
+        <p class="sec-intro">The specifications live in the Mobius Substrate monorepo, CC0 public domain — free for anyone to implement.</p>
+        <ul class="canon-list">
+          <li><a href="https://github.com/kaizencycle/Mobius-Substrate/blob/main/docs/epicon/EPICON-02.md"><span class="cname">docs/epicon/EPICON-02.md</span><span class="cdesc">Intent Publication &amp; Divergence Protocol — the six invariants</span></a></li>
+          <li><a href="https://github.com/kaizencycle/Mobius-Substrate/blob/main/docs/specs/EPICON_TIERING_SPEC_v0.1.md"><span class="cname">docs/specs/EPICON_TIERING_SPEC_v0.1.md</span><span class="cdesc">EP-1 / EP-2 / EP-3 grammar, classification rules, failure matrix</span></a></li>
+          <li><a href="https://github.com/kaizencycle/Mobius-Substrate/blob/main/schemas/epicon_constitutional_v1.schema.json"><span class="cname">schemas/epicon_constitutional_v1.schema.json</span><span class="cdesc">Constitutional ledger commitment — hashes and attestations, never evidence</span></a></li>
+          <li><a href="https://github.com/kaizencycle/Mobius-Substrate/tree/main/docs/epicon"><span class="cname">docs/epicon/</span><span class="cdesc">Full specification family: EPICON-01 coherence, -02 visibility, -03 consensus</span></a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="sec-label">Status</p>
+        <h2>What exists, exactly.</h2>
+        <p class="sec-intro">Claims match reality — the same discipline the gate enforces.</p>
+        <table class="status-table">
+          <tr><td>GitHub Action — Intent Publication Gate</td><td class="st-live">● LIVE · v1</td></tr>
+          <tr><td>GitHub App — Checks API, intent immutability</td><td class="st-road">◐ ROADMAP</td></tr>
+          <tr><td>CPC ledger attestation for EP-3 merges</td><td class="st-road">◐ ROADMAP</td></tr>
+          <tr><td>Integrity dashboard / CII</td><td class="st-concept">○ CONCEPT</td></tr>
+          <tr><td>GitLab · Jira · Slack integrations</td><td class="st-concept">○ CONCEPT</td></tr>
+        </table>
+        <p class="status-note">If it isn't marked live, it doesn't exist yet. This page does not sell futures.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <script>
-        // Waitlist form submission
-        document.querySelector('.waitlist-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = e.target.querySelector('input[type="email"]').value;
-            
-            // TODO: Connect to actual waitlist API
-            alert(`Thanks for joining! We'll contact you at ${email}`);
-            e.target.reset();
-        });
-        
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        });
-    </script>
+<footer>
+  <div class="wrap">
+    <span>EPICON Guard — part of <a href="https://mobius-substrate.com">Mobius Substrate</a></span>
+    <span>Spec CC0 · <a href="https://github.com/kaizencycle/epicon/blob/main/LICENSE">implementation license</a></span>
+    <span class="spacer"></span>
+    <span class="motto">"We heal as we walk."</span>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('.copy-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const el=document.getElementById(btn.dataset.copy);
+    navigator.clipboard.writeText(el.innerText).then(()=>{
+      const t=btn.textContent;btn.textContent='copied';
+      setTimeout(()=>btn.textContent=t,1600);
+    });
+  });
+});
+</script>
 </body>
 </html>

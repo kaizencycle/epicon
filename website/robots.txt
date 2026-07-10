@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
-Sitemap: https://epicondev.com/sitemap.xml
+
+Sitemap: https://epicon.mobius-substrate.com/sitemap.xml

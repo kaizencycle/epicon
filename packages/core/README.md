@@ -1,19 +1,7 @@
 # @epicon-guard/core
 
-Intent validation engine for EPICON Guard.
-
-## Features
-
-- Intent block parsing and validation
-- Scope enforcement
-- Time-bounded authority checks
-- Counterfactual validation
-- Intent evolution tracking
-
-## Coming Soon
-
-This package is under active development as part of the EPICON Guard MVP.
+> **Superseded:** Shared validation logic now lives in [`packages/guard-core`](../guard-core/) (`@epicon-guard/guard-core`), used by both the GitHub Action and Guard App (C-368 PR5).
 
 ## License
 
-CC0-1.0 - Part of Mobius Systems
+CC0-1.0 - Part of Mobius Substrate

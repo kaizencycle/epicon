@@ -4,8 +4,10 @@
  *
  * A zero-dependency Node HTTP server that hosts the canonical webhook endpoint:
  *
- *   POST /api/github/webhook   → verifies X-Hub-Signature-256, returns { ok: true }
- *   GET  /healthz              → 200 (platform health check)
+ *   GET  /                       → service manifest (role, version, endpoints)
+ *   GET  /health                 → platform health check (Render)
+ *   GET  /healthz                → legacy health alias
+ *   POST /api/github/webhook     → verifies X-Hub-Signature-256, returns { ok: true }
  *
  * Binds 0.0.0.0:$PORT so it runs unchanged on Render / Fly / Railway / any
  * container host. Configure GITHUB_WEBHOOK_SECRET with the same secret set on
@@ -16,6 +18,7 @@
 
 import { createServer as createHttpServer } from 'node:http';
 import { handleWebhook, WEBHOOK_PATH } from './handler.mjs';
+import { healthPayload, rootManifest } from './manifest.mjs';
 
 const MAX_BODY_BYTES = 5 * 1024 * 1024; // GitHub caps webhook payloads at ~25MB; 5MB is safely generous here.
 
@@ -41,11 +44,17 @@ export function createServer({ secret = process.env.GITHUB_WEBHOOK_SECRET, logge
   return createHttpServer(async (req, res) => {
     const path = (req.url || '/').split('?')[0];
 
-    // Lightweight health endpoint for hosting platforms (not the webhook route).
-    if (req.method === 'GET' && (path === '/healthz' || path === '/')) {
-      res.writeHead(200, { 'content-type': 'application/json' });
-      res.end(JSON.stringify({ ok: true, service: 'epicon-github-webhook' }));
-      return;
+    if (req.method === 'GET') {
+      if (path === '/health' || path === '/healthz') {
+        res.writeHead(200, { 'content-type': 'application/json' });
+        res.end(JSON.stringify(healthPayload()));
+        return;
+      }
+      if (path === '/') {
+        res.writeHead(200, { 'content-type': 'application/json' });
+        res.end(JSON.stringify(rootManifest()));
+        return;
+      }
     }
 
     let rawBody = Buffer.alloc(0);

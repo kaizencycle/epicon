@@ -13,7 +13,7 @@ services:
     rootDir: packages/github-app
     buildCommand: npm install
     startCommand: node src/server.mjs
-    healthCheckPath: /healthz
+    healthCheckPath: /health
     autoDeploy: false
     envVars:
       # Set this in the Render dashboard — must match the GitHub App's secret.

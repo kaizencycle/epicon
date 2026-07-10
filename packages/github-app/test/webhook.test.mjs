@@ -146,13 +146,26 @@ async function main() {
     check('POST unknown path → 404', res.status === 404, `got ${res.status}`);
   }
 
-  // 11. Health endpoint → 200
+  // 11. Health endpoints → 200 with version
   {
-    const res = await fetch(`${base}/healthz`);
-    check('GET /healthz → 200', res.status === 200, `got ${res.status}`);
+    const health = await fetch(`${base}/health`);
+    const healthJson = await health.json();
+    check('GET /health → 200', health.status === 200, `got ${health.status}`);
+    check('/health ok:true with version', healthJson.ok === true && typeof healthJson.version === 'string');
+    const legacy = await fetch(`${base}/healthz`);
+    check('GET /healthz → 200 (legacy)', legacy.status === 200, `got ${legacy.status}`);
   }
 
-  // 12. Missing secret configuration → 500 (fail closed)
+  // 12. Root manifest → role and endpoints
+  {
+    const res = await fetch(`${base}/`);
+    const json = await res.json();
+    check('GET / → 200 manifest', res.status === 200, `got ${res.status}`);
+    check('manifest declares role', Boolean(json.role));
+    check('manifest lists endpoints', Boolean(json.endpoints?.webhook?.path));
+  }
+
+  // 13. Missing secret configuration → 500 (fail closed)
   {
     const insecure = createServer({ secret: undefined, logger });
     await new Promise((r) => insecure.listen(0, '127.0.0.1', r));

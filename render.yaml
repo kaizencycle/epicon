@@ -10,12 +10,17 @@ services:
     name: epicon-github-webhook
     runtime: node
     plan: free
-    rootDir: packages/github-app
+    rootDir: .
     buildCommand: npm install
-    startCommand: node src/server.mjs
+    startCommand: node packages/github-app/src/server.mjs
     healthCheckPath: /health
     autoDeploy: false
     envVars:
-      # Set this in the Render dashboard — must match the GitHub App's secret.
       - key: GITHUB_WEBHOOK_SECRET
         sync: false
+      - key: APP_ID
+        sync: false
+      - key: PRIVATE_KEY
+        sync: false
+      - key: WEBHOOK_PATH
+        value: /api/github/webhook

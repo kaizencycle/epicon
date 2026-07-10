@@ -19,10 +19,14 @@ export const SOURCE_REPO = 'https://github.com/kaizencycle/epicon';
 export const SOURCE_ROOT = 'packages/github-app';
 
 export function healthPayload(ts = Math.floor(Date.now() / 1000)) {
+  const enforcement =
+    process.env.APP_ID?.trim() && process.env.PRIVATE_KEY?.trim() ? 'probot-i2' : 'transport-only';
+
   return {
     ok: true,
     service: SERVICE_NAME,
     version: SERVICE_VERSION,
+    enforcement_mode: enforcement,
     ts,
   };
 }

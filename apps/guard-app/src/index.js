@@ -119,11 +119,15 @@ async function runGate(context, { revalidate = false } = {}) {
   }
 }
 
-export function createGuardApp() {
+export function createGuardApp(options = {}) {
+  const webhookPath =
+    options.webhookPath ?? process.env.WEBHOOK_PATH ?? '/api/github/webhook';
+
   const probot = new Probot({
     appId: process.env.APP_ID,
     privateKey: process.env.PRIVATE_KEY,
     secret: process.env.GITHUB_WEBHOOK_SECRET,
+    webhookPath,
   });
 
   probot.on(

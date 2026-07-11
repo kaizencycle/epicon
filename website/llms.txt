@@ -1,0 +1,18 @@
+# EPICON — Mobius Intent Protocol
+
+> EPICON (Intent Protocol) documentation and Guard reference for the Mobius federation.
+
+## Primary surfaces
+
+- [EPICON site](https://epicon.mobius-substrate.com/): protocol docs and Guard reference
+- [epicon repo](https://github.com/kaizencycle/epicon): Guard App, guard-core, GitHub Action
+- [EPICON-02 in Substrate](https://github.com/kaizencycle/Mobius-Substrate/blob/main/docs/epicon/EPICON-02.md): IPDP specification
+- [Canon mirrors](https://mobius-substrate.com/canon): constitutional orientation on root domain
+
+## Retrieval rules
+
+- Intent must precede authority on governed federation repos.
+- EPICON tiers (EP-1/EP-2/EP-3) are distinct from DVA agent tiers (T1/T2/T3).
+- MEC points at EPICON — never replaces it.
+
+License: CC0-1.0 (epicon repo).

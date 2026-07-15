@@ -133,7 +133,7 @@ counterfactuals:
   - If tests fail, investigate before merge
 \`\`\`
 
-Learn more: https://epicon.dev/docs/intent-publication`
+Learn more: https://github.com/kaizencycle/Mobius-Substrate/tree/main/docs/epicon`
               });
               
               return;

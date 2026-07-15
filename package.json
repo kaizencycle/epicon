@@ -14,7 +14,7 @@
     "mobius",
     "integrity"
   ],
-  "homepage": "https://epicon.dev",
+  "homepage": "https://github.com/kaizencycle/epicon",
   "repository": {
     "type": "git",
     "url": "https://github.com/kaizencycle/epicon.git"
@@ -22,7 +22,7 @@
   "bugs": {
     "url": "https://github.com/kaizencycle/epicon/issues"
   },
-  "author": "Mobius Systems <hello@mobius.systems>",
+  "author": "kaizencycle (Mobius Substrate)",
   "license": "CC0-1.0",
   "engines": {
     "node": ">=18.0.0",

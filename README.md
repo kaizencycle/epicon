@@ -2,14 +2,14 @@
 
 **Git commits tell you WHAT changed. EPICON tells you WHY.**
 
-[![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE)
+[![License: CC0-1.0](https://img.shields.io/badge/license-CC0--1.0-lightgrey)](LICENSE)
 [![Status: Pre-Launch](https://img.shields.io/badge/Status-Pre--Launch-orange)](#roadmap)
 
 ---
 
 ## What is EPICON Guard?
 
-EPICON Guard is an **Intent Publication Gate** for GitHub: a CI action that fails closed unless a pull request declares *why* it exists before it can merge.
+EPICON Guard is an **Intent Publication Gate** for GitHub: a CI action that classifies each pull request into a consequence tier and enforces intent publication accordingly — fail-closed on EP-2/EP-3 paths, fail-open with marked backfill on EP-1.
 
 Traditional version control records what changed, when, and by whom — but never why, never for how long the decision should hold, and never what would make you revert it. As AI agents open more of your PRs, that gap becomes dangerous. EPICON Guard closes it.
 
@@ -79,7 +79,15 @@ counterfactuals:
 ```
 ````
 
-**3. The Guard validates.** A PR without a valid intent block fails closed:
+**3. The Guard validates.** Enforcement follows the tier failure matrix — not every missing intent blocks merge:
+
+| PR tier | Missing or invalid intent (`mode: enforce`) | Check result |
+| --- | --- | --- |
+| **EP-1** (e.g. docs-only) | Fail-open | Exits 0 — `PASS_WITH_BACKFILL` (backfill required, not silent) |
+| **EP-2** | Quarantine | Exits 1 — `QUARANTINE` |
+| **EP-3** | Fail closed | Exits 1 — `FAIL_CLOSED` |
+
+A consequential PR without a valid intent block fails:
 
 ```
 Error: I1 VIOLATION — No EPICON Intent Publication found.
@@ -87,7 +95,9 @@ Intent must precede authority (EPICON-02 §2.1).
 EPICON Guard verdict: FAIL_CLOSED (tier EP-3, 1 error(s), 0 warning(s))
 ```
 
-Add the block, and it passes. That's the whole cost of compliance: one fenced block per PR.
+Add the block, and it passes. That's the whole cost of compliance on consequential paths: one fenced block per PR.
+
+To make the gate binding on EP-2/EP-3, mark **Intent Publication Gate** as a required status check in branch protection — but know that EP-1 changes can still pass without intent unless you tighten policy or require backfill in a follow-up workflow step.
 
 ▶ **Live demo** — public fail → fix → pass repository is on the [roadmap](#roadmap) (not yet published).
 
@@ -145,13 +155,13 @@ Want something prioritized? [Open an issue](../../issues).
 
 ## Contributing
 
-EPICON Guard is open source under AGPL-3.0.
+EPICON Guard is open source under [CC0-1.0](LICENSE) (public domain).
 
 ```bash
 git clone https://github.com/kaizencycle/epicon.git
 cd epicon
-npm install
-npm test
+node test/classify.test.mjs      # tier classifier (shipped Action)
+node test/policy-ref.test.mjs    # base-SHA policy resolution (v1.1)
 ```
 
 Pull requests to this repo require an intent block. Naturally.
@@ -168,7 +178,8 @@ EPICON Guard implements the EPICON-02 protocol ("no consequential action without
 
 ## License
 
-[AGPL-3.0](LICENSE)
+[CC0-1.0](LICENSE) — validator and Action source in this repo. EPICON protocol
+specifications in [Mobius-Substrate](https://github.com/kaizencycle/Mobius-Substrate/tree/main/docs/epicon) are also CC0.
 
 ---
 

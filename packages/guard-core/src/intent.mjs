@@ -12,7 +12,7 @@ export const MEC_CONSTITUTIONAL_REGEX =
 export const SCOPE_ENVELOPES = {
   docs: ['docs/', 'README', 'DOCS.md', 'CONTRIBUTING.md', 'LICENSE', 'FOR-'],
   ci: ['.github/'],
-  core: ['apps/', 'packages/', 'src/', 'lib/'],
+  core: ['app/', 'apps/', 'packages/', 'src/', 'lib/'],
   infra: ['infra/', 'render.yaml', 'vercel.json', 'Dockerfile', 'docker-compose', 'netlify.toml'],
   sentinels: ['sentinels/', 'agents/'],
   labs: ['labs/', 'experiments/'],
